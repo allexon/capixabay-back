@@ -1,0 +1,54 @@
+[
+    {
+        "id": 1,
+        "rota": "ROTA-SERRA-1",
+        "municipio": "Serra",
+        "uf": "ES",
+        "bairros": [
+            "CARAPINA-GRANDE-SERRA-ES",
+            "EURICO-SALLES-SERRA-ES",
+            "CONJUNTO-CARAPINA-I-SERRA-ES",
+            "MANOEL-PLAZA-SERRA-ES",
+            "HELIO-FERRAZ-SERRA-ES",
+            "DE-FATIMA-SERRA-ES",
+            "DIAMANTINA-SERRA-ES",
+            "POLO-INDUSTRIAL-TUBARAO-SERRA-ES",
+            "SAO-DIOGO-II-SERRA-ES",
+            "BOA-VISTA-II-SERRA-ES"
+        ]
+    },
+    {
+        "id": 2,
+        "rota": "ROTA-SERRA-2",
+        "municipio": "Serra",
+        "uf": "ES",
+        "bairros": [
+            "CARAPINA-GRANDE-SERRA-ES",
+            "EURICO-SALLES-SERRA-ES",
+            "CONJUNTO-CARAPINA-I-SERRA-ES",
+            "MANOEL-PLAZA-SERRA-ES",
+            "HELIO-FERRAZ-SERRA-ES",
+            "DIAMANTINA-SERRA-ES",
+            "POLO-INDUSTRIAL-TUBARAO-SERRA-ES",
+            "SAO-DIOGO-II-SERRA-ES",
+            "AREA-RURAL-DE-SERRA-SERRA-ES"
+        ]
+    },
+    {
+        "id": 3,
+        "rota": "ROTA-VITORIA-1",
+        "municipio": "Vitória",
+        "uf": "ES",
+        "bairros": [
+            "CARAPINA-GRANDE-SERRA-ES",
+            "AEROPORTO-VITORIA-ES",
+            "ANDORINHAS-VITORIA-ES",
+            "ANTONIO-HONORIO-VITORIA-ES",
+            "ARIOVALDO-FAVALESSA-VITORIA-ES",
+            "BARRO-VERMELHO-VITORIA-ES",
+            "BELA-VISTA-VITORIA-ES",
+            "BENTO-FERREIRA-VITORIA-ES",
+            "BOA-VISTA-VITORIA-ES"
+        ]
+    }
+]

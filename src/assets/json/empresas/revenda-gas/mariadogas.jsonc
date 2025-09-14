@@ -1,0 +1,53 @@
+[
+    {
+        "id": 1,
+        "cnpj": "45861470000188",
+        "url_completa": "mariadogas.capixabay.com.br/comprar-gas",
+        "celuar": "2784996603623",
+        "whatsApp": "552784996603623",
+        "autorizacao_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "autorizacao_email_acesso": "allexon@gmail.com",
+        "nome_fiscal": "Maria do Gás Revenda de Gás e Água",
+        "nome_fantasia": "Maria do Gás",
+        "slug": "REVENDA-GAS",
+        "logo_url": "/produto-revenda-gas/produto-revenda-gas/logo-mariadogas",
+        "chaves-pix": [
+            {
+                "chave": "'mariadogas@gmail.com",
+                "nome": "Maria da Silva"
+            }
+        ],
+        "categoria": [
+            {
+                "id": 1,
+                "tipo": "REVENDA-GAS",
+                "descricao": "Revenda de Gás e Água"
+            }
+        ],
+        "endereco": {
+            "logradouro": "Av Alpheu Ribeiro",
+            "numero": "830",
+            "bairro": "Carapina Grande",
+            "cidade": "Serra",
+            "estado": "ES",
+            "cep": "29160065"
+        },
+        "produtos": [
+            {
+                "descricao": "Gás de Cozinha, Botijão 13Kg",
+                "preco": "99.99"
+            },
+            {
+                "descricao": "Galão de Água 20L",
+                "preco": "12.90"
+            }
+        ],
+        "regioes_atendidas": [
+            "ROTA-SERRA-2"
+        ],
+        "criado_em": "2025-06-05T12:00:00.000Z",
+        "atualizado_em": "2025-06-05T12:00:00.000Z",
+        "ativa": false,
+        "aberta": false
+    }
+]

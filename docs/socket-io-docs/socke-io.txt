@@ -1,0 +1,1 @@
+process.memoryUsage() → pra ver consumo de memória.

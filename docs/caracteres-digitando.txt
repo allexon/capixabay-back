@@ -1,0 +1,27 @@
+- **LINUX:**  
+`	`	007C
+?	003F	Ctrl+Shift+U 3f Enter
+~	007E	Ctrl+Shift+U 7e Enter
+\	005C	Ctrl+Shift+U 5c Enter
+/	002F	Ctrl+Shift+U 2f Enter
+@	0040	Ctrl+Shift+U 40 Enter
+#	0023	Ctrl+Shift+U 23 Enter
+$	0024	Ctrl+Shift+U 24 Enter
+^	005E	Ctrl+Shift+U 5e Enter
+&	0026	Ctrl+Shift+U 26 Enter
+*	002A	Ctrl+Shift+U 2a Enter
+%	0025	Ctrl+Shift+U 25 Enter
+
+- **Windows:**  
+- `Alt + 124` → `|`
+- `Alt + 63` → `?`
+- `Alt + 126` → `~`
+- `Alt + 92` → `\`
+- `Alt + 47` → `/`
+- `Alt + 64` → `@`
+- `Alt + 35` → `#`
+- `Alt + 36` → `$`
+- `Alt + 94` → `^`
+- `Alt + 38` → `&`
+- `Alt + 42` → `*`
+- `Alt + 37` → `%`

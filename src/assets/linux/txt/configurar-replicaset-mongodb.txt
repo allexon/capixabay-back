@@ -1,0 +1,177 @@
+--- LOGS DO CAPIXABAY
+cat ~/capixabay-mongodb-rs/log1.log
+
+
+---Principal Arquivo de configuração do MongoDB:
+/etc/mongod.conf
+
+---Comando interessante para saber o esta funcionando no mondodb
+ps aux | grep mongod
+
+******************************* CRIANDDO O REPLICASET ***************************************************
+mongod --version
+sudo systemctl stop mongod
+sudo systemctl start mongod
+sudo systemctl restart mongod
+sudo systemctl status mongod
+sudo systemctl enable mongod
+sudo systemctl disable mongod
+
+// criando os meus replicaset locais mongodb
+mkdir -p ~/capixabay-mongodb-rs/data1
+mkdir -p ~/capixabay-mongodb-rs/data2
+mkdir -p ~/capixabay-mongodb-rs/data3
+
+// Criar Replicasets
+mongod --replSet "rs0" --port 27017 --dbpath ~/capixabay-mongodb-rs/data1 --bind_ip localhost --fork --logpath ~/capixabay-mongodb-rs/log1.log
+mongod --replSet "rs0" --port 27018 --dbpath ~/capixabay-mongodb-rs/data2 --bind_ip localhost --fork --logpath ~/capixabay-mongodb-rs/log2.log
+mongod --replSet "rs0" --port 27019 --dbpath ~/capixabay-mongodb-rs/data3 --bind_ip localhost --fork --logpath ~/capixabay-mongodb-rs/log3.log
+
+// Conectar uma stancia do replicaset
+mongosh --host localhost --port 27017
+
+// dentro do mongosh aplicaque
+rs.initiate(
+  {
+    _id: "rs0",
+    members: [
+      { _id: 0, host: "localhost:27017" },
+      { _id: 1, host: "localhost:27018" },
+      { _id: 2, host: "localhost:27019" }
+    ]
+  }
+)
+
+// Verificar se esta instalado
+mongosh --port 27017
+
+// STATUS DOS REPLICASET DENTRO DO mongosh
+rs.status()
+
+// ********************** DICAS GERAL *********************************
+-- 4. Configuração para o Atlas
+Quando você migrar para o Atlas, eles já usam replicaset, então basta:
+Usar a string de conexão com replicaSet (geralmente já vem configurado).
+Usar as transações exatamente igual no código, sem alterações.
+Apenas ajustar a URI para a string que o Atlas fornece.
+
+--5. Dicas extras importantes
+Certifique-se de que o MongoDB está versão 4.0+ (transações só disponíveis a partir da 4.0).
+Transações funcionam melhor em coleções com replicaSet e WiredTiger storage engine (padrão hoje).
+Em produção, use autenticação e TLS (Atlas já vem configurado assim).
+Teste bem as transações, lidando com erros e abortos, pois podem falhar em condições de concorrência.
+Use session.abortTransaction() se algum passo falhar dentro da transação.
+O MongoDB limita as transações a 16MB de tamanho e 60 segundos por padrão (podem ser configurados).
+
+// ********************** RESUMO ROTERIRO DE EXECUCAO *********************************
+--- Passo	        Comando/ação
+--- Criar           diretórios de dados	mkdir -p ~/mongo-rs/data{1,2,3}
+--- Rodar           3 instâncias mongod	mongod --replSet rs0 --port 27017 --dbpath ... (x3)
+--- Iniciar         replicaset no mongo	rs.initiate(...)
+--- Confirmar       replicaset	rs.status()
+--- Conectar        com string replicaset	mongodb://host1,host2,host3/?replicaSet=rs0
+--- Usar            transações com sessions	session.withTransaction() no driver
+
+
+******************************************* INSTALÇÃO DOS SERVIÇOS DE REPLICASET MONGO DB ***************************************
+
+---- capixabay-mongodb-27017.service ----
+
+[Unit]
+Description=MongoDB Replica Set Instance rodando na porta 27017
+After=network.target
+
+[Service]
+User=alexon
+ExecStart=/usr/bin/mongod --replSet rs0 --port 27017 --dbpath=/home/alexon/capixabay-mongodb-rs/data1 --bind_ip=localhost
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=capixabay-mongodb-27017
+
+[Install]
+WantedBy=multi-user.target
+
+---- capixabay-mongodb-27018.service ----
+
+[Unit]
+Description=MongoDB Replica Set Instance rodando na porta 27018
+After=network.target
+
+[Service]
+User=alexon
+ExecStart=/usr/bin/mongod --replSet rs0 --port 27018 --dbpath=/home/alexon/capixabay-mongodb-rs/data2 --bind_ip=localhost
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=capixabay-mongodb-27018
+
+[Install]
+WantedBy=multi-user.target
+
+
+---- capixabay-mongodb-27019.service ----
+
+[Unit]
+Description=MongoDB Replica Set Instance rodando na porta 27019
+After=network.target
+
+[Service]
+User=alexon
+ExecStart=/usr/bin/mongod --replSet rs0 --port 27019 --dbpath=/home/alexon/capixabay-mongodb-rs/data3 --bind_ip=localhost
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=capixabay-mongodb-27019
+
+[Install]
+WantedBy=multi-user.target
+
+
+------ Passo para instalação ----
+Passo 1
+depois copiar o arquivos:
+capixabay-mongodb-27017.service
+capixabay-mongodb-27018.service
+capixabay-mongodb-27019.service
+
+[ COPIAR ] para:
+/etc/systemd/system/capixabay-mongodb-27017.service
+/etc/systemd/system/capixabay-mongodb-27018.service
+/etc/systemd/system/capixabay-mongodb-27019.service
+
+[ REMOVER ] a permissao de execução dos servição por segurança, arquivos .service sao recomendados
+sudo chmod 644 /etc/systemd/system/capixabay-mongodb-2701*.service
+
+Passo 2
+sudo systemctl daemon-reload
+
+sudo systemctl enable capixabay-mongodb-27017
+sudo systemctl enable capixabay-mongodb-27018
+sudo systemctl enable capixabay-mongodb-27019
+
+sudo systemctl start capixabay-mongodb-27017
+sudo systemctl start capixabay-mongodb-27018
+sudo systemctl start capixabay-mongodb-27019
+
+Passo 3
+sudo systemctl status capixabay-mongodb-27017
+sudo systemctl status capixabay-mongodb-27018
+sudo systemctl status capixabay-mongodb-27019
+
+Passo 4
+Precisa executar esta comando pelo menos um vez -> rs.initiate
+mongosh
+
+rs.initiate({
+  _id: "rs0",
+  members: [
+    { _id: 0, host: "localhost:27017" },
+    { _id: 1, host: "localhost:27018" },
+    { _id: 2, host: "localhost:27019" }
+  ]
+})
+
+mongosh
+rs.status()
+

@@ -1,0 +1,19 @@
+// no componente ModalPedidos.tsx
+import { useHttpListaPedidosEnviadosAceitos } from '@/http/useHttpListaPedidosEnviadosAceitos'
+
+const ModalPedidos = () => {
+  const { data, mutate } = useHttpListaPedidosEnviadosAceitos()
+
+  useEffect(() => {
+    // sempre que abrir o modal, força atualização imediata
+    mutate()
+  }, [mutate])
+
+  return (
+    <div>
+      {data?.data?.map(p => (
+        <div key={p._id}>{p.nome}</div>
+      ))}
+    </div>
+  )
+}

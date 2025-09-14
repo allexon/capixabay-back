@@ -1,0 +1,16 @@
+[Unit]
+Description=Capixabay Backend (Node.js + Socket.IO) - Porta 3001
+After=network.target
+
+[Service]
+Type=simple
+User=alexon
+WorkingDirectory=/media/HD-AUXILIAR/solidiy/apps/capixabay-back
+ExecStartPre=/media/HD-AUXILIAR/solidiy/apps/capixabay-back/src/sockets/config-sockets/capixabay-prod-porta-3001.sh
+ExecStart=/usr/bin/node /media/HD-AUXILIAR/solidiy/apps/capixabay-back/dist/server.js
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

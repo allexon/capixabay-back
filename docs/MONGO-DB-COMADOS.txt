@@ -1,0 +1,82 @@
+// Remover unlooking banco
+    --- sudo rm -f /tmp/mongodb-27017.sock
+    --- sudo systemctl restart mongod
+    --- mongosh
+    --- db.runCommand({ ping: 1 })
+
+// Consultar um nó replicaset
+    --- mongodb://localhost:27018/?readPreference=secondary
+
+// Ver em tempo Real o que Acontece na coleção do mongodb
+    --- db.<USUARIO_AUTORIZACAO>.watch()
+
+// Exemplo de uso
+    --- mongosh --port 27019
+    --- use CAPIXABAY_DB
+    ---db.usuarios.watch()
+
+// Ler dados de Qualquer Nó em um replicaset
+monngosh --port 2017 // 2018 // 2019
+use CAPIXABAY_DB
+db.USUARIO_AUTORIZACAO.find()
+
+// retorno todoss os nós
+rs0 [direct: primary] CAPIXABAY_DB> rs.status().members.forEach(m => print(m.name + " => " + m.stateStr))
+127.0.0.1:27017 => SECONDARY
+127.0.0.1:27018 => SECONDARY
+127.0.0.1:27019 => PRIMARY
+
+// Acessar o no que pretende Ler
+estara lendo o no 2017
+mongosh --port 20217 
+
+
+show databases()
+use CAPIXABAY-DB
+db.getMongo().setReadPref('secondary')
+db.USUARIOS_AUTORIZACAO.find().pretty()
+console.table(db.USUARIOS_AUTORIZACAO.find().toArray())
+
+console.table(
+  db.USUARIOS_AUTORIZACAO.find({}, { _id: 0, nome: 1, email_acesso: 1 }).toArray()
+)
+
+
+/// ****************** COMANDOS ***************************
+
+/// COMANDOS
+show dbs
+show collections
+db.USUARIOS_AUTORIZACAO.find()
+db.USUARIOS_AUTORIZACAO.find().prety
+
+--- LISTA OS REPLICASETS E SABER QUAL É PRIMARIO
+1 - Descobrir o nó primario
+rs.status().members.forEach(function(member) {print("Host: " + member.name + " | Estado: " + member.stateStr)});
+
+2 - Entrar no nó primario
+mongosh mongodb://127.0.0.1:27018
+
+3 - Verificar se esta no nó primario
+rs.isMaster().primary
+use CAPIXABAY_DB
+db.dropDatabase()
+
+// Configurar esta url no mongo compass
+mongodb://localhost:27017,localhost:27018,localhost:27019/CAPIXABAY_DB?replicaSet=rs0&readPreference=primary
+
+--- MUDAR O NO PRIMARIA ---
+1 - mongosh -> rs.isMaster().primary // para saber que é o nó primario
+2 - entrar no nó primário -> mongosh mongodb://127.0.0.1:27018/admin  (exemplo se for 27018)
+3 - mudar a prioridade -> 
+                            fg = rs.conf()
+                            cfg.members[0].priority = 2  // 27017 (maior prioridade)
+                            cfg.members[1].priority = 1  // 27018
+                            cfg.members[2].priority = 1  // 27019
+                            rs.reconfig(cfg)
+4 - rs.stepDown() (mudar elege o nó primario, confirma a mudança)
+5 - verfificar se modou -> rs.isMaster().primary
+
+
+
+

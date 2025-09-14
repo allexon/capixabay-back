@@ -1,0 +1,13 @@
+VOLTAR NESTES PONTOS
+
+Se quiser evoluir depois, também dá para:
+
+Criar reconexão automática com retry/backoff.
+
+Adicionar logs de erro/monitoramento.
+
+Integrar o WebSocket com uma event-bus interna baseada em Zustand ou RxJS.
+
+Se quiser te mostro isso passo a passo depois.
+
+Deseja que o websocket-store.ts também remova listeners quando desmonta ou podemos deixar centralizado sem limpar manualmente?
