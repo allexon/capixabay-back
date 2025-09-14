@@ -1,5 +1,8 @@
 # Ignorar dependências
 node_modules/
+docs
+docs/
+docs/*
 
 # Ignorar a pasta de documentação
 docs/
