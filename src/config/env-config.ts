@@ -1,62 +1,54 @@
-// src/config/env-config (backend)
+// src/config/env-config.ts (Back-end)
 import dotenv from 'dotenv'
 import path from 'path'
 
-// Carrega sempre do .env padrão
 dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 
-const rawMode = process.env.ENV_MODE || 'development'
-const NODE_ENV = process.env.NODE_ENV || rawMode
-const isProd = NODE_ENV === 'production'
-const isDev = NODE_ENV === 'development'
+const nodeEnv = process.env.NODE_ENV
+const isDev = nodeEnv === 'DEV'
+const isProd = nodeEnv === 'PROD'
+const isProdLocal = nodeEnv === 'PROD_LOCAL'
 
-const DOMAIN = isProd ? process.env.DOMAIN_PROD : process.env.DOMAIN_DEV
-const PORT = isProd ? Number(process.env.PORT_PROD) : Number(process.env.PORT_DEV)
-const baseURL = `${DOMAIN}:${PORT}`
+// A porta do back-end
+let port: number
+if (isDev) {
+    port = Number(process.env.DEV_BACK_PORT)
+} else if (isProdLocal) {
+    port = Number(process.env.PROD_PORT_LOCAL)
+} else if (isProd) {
+    port = Number(process.env.PROD_PORT)
+} else {
+    port = Number(process.env.DEV_BACK_PORT)
+}
 
-console.log(`🌍 Ambiente: ${NODE_ENV.toUpperCase()}`)
-console.log(`🔗 BaseURL: ${baseURL}`)
-
-// Verifica se IP_LOCALHOST está definido e usa como fallback para testes na rede local
-const ipLocalhost = process.env.IP_LOCALHOST || 'localhost'
+// Domínios
+const frontDomain = process.env.FRONT_PREFIX + '.' + process.env.DOMAIN
+const backDomain = process.env.BACK_PREFIX + '.' + process.env.DOMAIN
 
 export const ENV = {
-    // Mongo
-    MONGO_URL: process.env.MONGO_URL as string,
+    // Variáveis de ambiente
+    PORT: port,
+    MONGO_URL: isProd ? process.env.PROD_MONGODB as string : process.env.DEV_MONGODB as string,
     MONGO_DB_NAME: process.env.MONGO_DB_NAME as string,
-
-    // Email
     ZOHO_EMAIL: process.env.ZOHO_EMAIL as string,
     ZOHO_PASSWORD: process.env.ZOHO_PASSWORD as string,
+    DEV_MOBILE: process.env.DEV_MOBILE as string,
 
-    // Base URLs
-    HTTP_URL: `http://${baseURL}`,
-    HTTPS_URL: `https://${baseURL}`,
-    WS_URL: `ws://${baseURL}`,
-    WSS_URL: `wss://${baseURL}`,
+    // Lógica do ambiente
+    IS_DEV: isDev,
+    IS_PROD: isProd,
+    MODE: nodeEnv,
 
-    // Porta
-    PORT,
+    // URLs da aplicação
+    FRONTEND_URL: isDev ? `http://${frontDomain}:${process.env.DEV_FRONT_PORT}` : `https://${frontDomain}`,
+    BACKEND_URL: isDev ? `http://${backDomain}:${process.env.DEV_BACK_PORT}` : `https://${backDomain}`,
 
     // CORS
     ALLOWED_ORIGINS: [
-        `http://${baseURL}`,
-        `https://${baseURL}`,
-        `ws://${baseURL}`,
-        `wss://${baseURL}`,
-        ...(isDev ? [
-            'http://localhost:5173',
-            'http://127.0.0.1:5173',
-            'http://capixabay.local:5173',
-            `http://${ipLocalhost}:5173`, // Frontend no celular via IP
-            `ws://${ipLocalhost}:3000`,   // WebSocket para backend via IP
-            `wss://${ipLocalhost}:3000`,  // WebSocket seguro via IP
-            `http://${ipLocalhost}:3000`, // Backend acessível via IP
-            `https://${ipLocalhost}:3000` // Backend acessível via IP (se aplicável)
-        ] : [])
-    ],
-
-    MODE: NODE_ENV,
-    IS_DEV: isDev,
-    IS_PROD: isProd
+        `http://${frontDomain}:${process.env.DEV_FRONT_PORT}`,
+        `http://localhost:${process.env.DEV_FRONT_PORT}`,
+        `http://127.0.0.1:${process.env.DEV_FRONT_PORT}`,
+        ...(isDev ? [`http://${process.env.DEV_MOBILE}:${process.env.DEV_FRONT_PORT}`] : []),
+        `http://${backDomain}:${port}` // Permite a comunicação do próprio back-end
+    ]
 }

@@ -16,6 +16,7 @@ type TRequire = {
 
 // 🚀 FUNÇÃO PRINCIPAL
 export const Login = async (req: TRequire, socket: Socket) => {
+
     const { AUTORIZACOES } = await fnConnectDirectCollection()
     const _replicaSetParams = { readConcern: new ReadConcern('majority'), readPreference: ReadPreference.primary }
 
@@ -28,7 +29,7 @@ export const Login = async (req: TRequire, socket: Socket) => {
 
     const req_email_acesso = data.email_acesso
     const req_codigo_acesso = data.codigo_acesso
-    
+
     try {
         // SEMPRE COMEÇA A PROCURA PELO EMAIL DE ACESSO
         const resEmailAcesso = await AUTORIZACOES.findOne({ email_acesso: req_email_acesso }, _replicaSetParams)

@@ -7,15 +7,16 @@ type TProps = {
     codigo_acesso?: string | null
 }
 
-export const fnEnviarEmail = async (props: TProps): Promise<true | false> => {
-    console.log(`📧 Usando configurações de email de ${process.env.NODE_ENV === 'production' ? 'PRODUÇÃO' : 'DESENVOLVIMENTO'}`)
+export const fnEnviarEmail = async (props: TProps): Promise<boolean> => {
+    // Ajuste aqui para usar a variável NODE_ENV como 'PROD' ou 'DEV'
+    const ambiente = process.env.NODE_ENV === 'PROD' ? 'PROD' : 'DEV'
 
     const email = props.email_acesso?.trim() || null
     const codigo = props.codigo_acesso?.trim() || null
 
     if (!email || !codigo) {
         console.log('❌ Email ou código de acesso inválidos.', email, codigo)
-        return false
+        return false;
     }
 
     const transporter = nodemailer.createTransport({
@@ -45,13 +46,10 @@ export const fnEnviarEmail = async (props: TProps): Promise<true | false> => {
           <p>Se você não solicitou este código, ignore este e-mail.</p>
         </div>
       `
-        })
-        if (_res) {
-            return true
-        } else {
-            return false
-        }
-    } catch (error) {        
+        });
+        return !!_res
+    } catch (error) {
+        console.error('❌ Erro ao enviar e-mail:', error)
         return false
     }
 }

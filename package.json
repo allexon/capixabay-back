@@ -3,17 +3,13 @@
     "version": "1.0.0",
     "main": "dist/server.js",
     "scripts": {
-        "dev": "cross-env NODE_ENV=development nodemon --watch src --ext ts,json --exec ts-node -r tsconfig-paths/register src/Server.ts",
-        "prod": "cross-env NODE_ENV=production tsc -b && node dist/Server.js",
-        "build": "tsc",
-        "dev:npx": "cross-env NODE_ENV=development npx ts-node -r tsconfig-paths/register src/Server.ts",
+        "dev": "cross-env NODE_ENV=DEV nodemon --watch src --ext ts,json --exec ts-node -r tsconfig-paths/register src/Server.ts",
+        "build": "tsc -b && tsc-alias",
+        "prod": "npm run build && cross-env NODE_ENV=PROD node dist/Server.js",
+        "dev:npx": "cross-env NODE_ENV=DEV npx ts-node -r tsconfig-paths/register src/Server.ts",
         "check-os-imports": "npx tsc --noEmit"
     },
     "type": "commonjs",
-    "description": "",
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
     "dependencies": {
         "dotenv": "^16.5.0",
         "express": "^5.1.0",
