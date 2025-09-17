@@ -4,96 +4,85 @@ import path from 'path'
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 
-type EnvType = {
-    NODE_ENV: 'DEV' | 'PROD_LOCAL' | 'PROD'
-    DOMAIN: string
-    FRONT_PREFIX: string
-    BACK_PREFIX: string
-    PORT: number
-    ZOHO_EMAIL: string
-    ZOHO_PASSWORD: string
-    MONGO_DB_NAME: string
-    MONGODB_URL: string
-    DEV_MOBILE?: string
+type TEnvKeys = 'DEV' | 'PROD_LOCAL' | 'PROD'
+
+const fnDev = (env: Record<string, string | undefined>) => {
+    const portBack = Number(env.DEV_PORT_BACK)
+    const portFront = Number(env.DEV_PORT_FRONT)
+
+    // Exemplo de domínios completos:
+    // -> http://app.localhost:3000
+    // -> http://back.localhost:3001
+    // -> http://192.168.0.6:3000
+
+    const allowedOrigins = [
+        `http://app.${env.DEV_DOMAIN}:${portFront}`,
+        'http://localhost',
+        'http://127.0.0.1',
+        env.DEV_MOBILE ? `http://${env.DEV_MOBILE}:${portFront}` : ''
+    ].filter(Boolean) as string[]
+
+    return {
+        NODE_ENV: 'DEV' as TEnvKeys,
+        PORT: portBack,
+        ZOHO_EMAIL: env.DEV_ZOHO_EMAIL,
+        ZOHO_PASSWORD: env.DEV_ZOHO_PASSWORD,
+        MONGO_DB_NAME: env.DEV_LOCAL_MONGODB_NAME,
+        MONGODB_URL: env.DEV_LOCAL_MONGODB_URL,
+        FRONTEND_URL: `http://app.${env.DEV_DOMAIN}:${portFront}`,
+        BACKEND_URL: `http://back.${env.DEV_DOMAIN}:${portBack}`,
+        ALLOWED_ORIGINS: allowedOrigins,
+    }
 }
 
-const envMapping: Record<string, EnvType> = {
-    DEV: {
-        NODE_ENV: 'DEV',
-        DOMAIN: process.env.DEV_DOMAIN!,
-        FRONT_PREFIX: 'app',
-        BACK_PREFIX: 'back',
-        PORT: Number(process.env.DEV_PORT!),
-        ZOHO_EMAIL: process.env.DEV_ZOHO_EMAIL!,
-        ZOHO_PASSWORD: process.env.DEV_ZOHO_PASSWORD!,
-        MONGO_DB_NAME: process.env.DEV_LOCAL_MONGODB_NAME!,
-        MONGODB_URL: process.env.DEV_LOCAL_MONGODB_URL!,
-        DEV_MOBILE: process.env.DEV_MOBILE!,
-    },
-    PROD_LOCAL: {
-        NODE_ENV: 'PROD_LOCAL',
-        DOMAIN: process.env.PROD_LOCAL_DOMAIN!,
-        FRONT_PREFIX: 'app',
-        BACK_PREFIX: 'back',
-        PORT: Number(process.env.PROD_LOCAL_PORT!),
-        ZOHO_EMAIL: process.env.PROD_LOCAL_ZOHO_EMAIL!,
-        ZOHO_PASSWORD: process.env.PROD_LOCAL_ZOHO_PASSWORD!,
-        MONGO_DB_NAME: process.env.PROD_LOCAL_MONGODB_NAME!,
-        MONGODB_URL: process.env.PROD_LOCAL_MONGODB_URL!,
-    },
-    PROD: {
-        NODE_ENV: 'PROD',
-        DOMAIN: process.env.PROD_DOMAIN!,
-        FRONT_PREFIX: 'app',
-        BACK_PREFIX: 'back',
-        PORT: Number(process.env.PROD_PORT!),
-        ZOHO_EMAIL: process.env.PROD_ZOHO_EMAIL!,
-        ZOHO_PASSWORD: process.env.PROD_ZOHO_PASSWORD!,
-        MONGO_DB_NAME: process.env.PROD_MONGODB_NAME!,
-        MONGODB_URL: process.env.PROD_MONGODB_URL!,
-    },
+const fnProdLocal = (env: Record<string, string | undefined>) => {
+    const port = Number(env.PROD_LOCAL_PORT)
+    const domain = env.PROD_LOCAL_DOMAIN!
+
+    // Exemplo de domínios completos:
+    // -> http://app.capixabay.com.br:3002
+    // -> http://back.capixabay.com.br:3002
+    return {
+        NODE_ENV: 'PROD_LOCAL' as TEnvKeys,
+        PORT: port,
+        ZOHO_EMAIL: env.PROD_LOCAL_ZOHO_EMAIL,
+        ZOHO_PASSWORD: env.PROD_LOCAL_ZOHO_PASSWORD,
+        MONGO_DB_NAME: env.PROD_LOCAL_MONGODB_NAME,
+        MONGODB_URL: env.PROD_LOCAL_MONGODB_URL,
+        FRONTEND_URL: `http://app.${domain}:${port}`,
+        BACKEND_URL: `http://back.${domain}:${port}`,
+        ALLOWED_ORIGINS: [`http://app.${domain}:${port}`]
+    }
 }
 
-// 🔑 Agora só precisa de 1 variável seletora
-const nodeEnv = process.env.NODE_ENV as EnvType['NODE_ENV'] || 'DEV'
-const envVars = envMapping[nodeEnv]
+const fnProd = (env: Record<string, string | undefined>) => {
+    const port = Number(env.PROD_PORT)
+    const domain = env.PROD_DOMAIN!
 
-if (!envVars) {
-    throw new Error(`Ambiente desconhecido: ${nodeEnv}`)
+    // Exemplo de domínios completos:
+    // -> https://app.capixabay.com.br:3003
+    // -> https://back.capixabay.com.br:3003
+    return {
+        NODE_ENV: 'PROD' as TEnvKeys,
+        PORT: port,
+        ZOHO_EMAIL: env.PROD_ZOHO_EMAIL,
+        ZOHO_PASSWORD: env.PROD_ZOHO_PASSWORD,
+        MONGO_DB_NAME: env.PROD_MONGODB_NAME,
+        MONGODB_URL: env.PROD_MONGODB_URL,
+        FRONTEND_URL: `https://app.${domain}`,
+        BACKEND_URL: `https://back.${domain}`,
+        ALLOWED_ORIGINS: [`https://app.${domain}`]
+    }
 }
 
-const isDev = envVars.NODE_ENV === 'DEV'
-const protocol = isDev ? 'http' : 'https'
-const frontPort = isDev ? `:${envVars.PORT - 1}` : ''
-const backPort = isDev ? `:${envVars.PORT}` : ''
+const nodeEnv = (process.env.NODE_ENV as TEnvKeys) ?? 'DEV'
+let envConfig: ReturnType<typeof fnDev>
 
-export const ENV = {
-    PORT: envVars.PORT,
-    MONGO_URL: envVars.MONGODB_URL,
-    MONGO_DB_NAME: envVars.MONGO_DB_NAME,
-    ZOHO_EMAIL: envVars.ZOHO_EMAIL,
-    ZOHO_PASSWORD: envVars.ZOHO_PASSWORD,
-    DEV_MOBILE: envVars.DEV_MOBILE,
-
-    IS_DEV: isDev,
-    IS_PROD_LOCAL: envVars.NODE_ENV === 'PROD_LOCAL',
-    IS_PROD: envVars.NODE_ENV === 'PROD',
-    MODE: envVars.NODE_ENV,
-
-    FRONTEND_URL: isDev
-        ? `${protocol}://${envVars.DOMAIN}${frontPort}`
-        : `${protocol}://${envVars.FRONT_PREFIX}.${envVars.DOMAIN}`,
-
-    BACKEND_URL: isDev
-        ? `${protocol}://${envVars.DOMAIN}${backPort}`
-        : `${protocol}://${envVars.BACK_PREFIX}.${envVars.DOMAIN}`,
-
-    ALLOWED_ORIGINS: [
-        isDev
-            ? `${protocol}://${envVars.DOMAIN}${frontPort}`
-            : `${protocol}://${envVars.FRONT_PREFIX}.${envVars.DOMAIN}`,
-        `http://localhost:${envVars.PORT - 1}`,
-        `http://127.0.0.1:${envVars.PORT - 1}`,
-        ...(isDev && envVars.DEV_MOBILE ? [`http://${envVars.DEV_MOBILE}:${envVars.PORT - 1}`] : []),
-    ],
+switch (nodeEnv) {
+    case 'DEV': envConfig = fnDev(process.env); break;
+    case 'PROD_LOCAL': envConfig = fnProdLocal(process.env); break;
+    case 'PROD': envConfig = fnProd(process.env); break;
+    default: envConfig = fnDev(process.env); break;
 }
+
+export const ENV = envConfig

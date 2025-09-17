@@ -8,7 +8,8 @@ import { ENV } from '@/config/env-config' // <-- Adicione esta linha
 type THttpHandler = (req: Request, res: Response, io: SocketIOServer) => void
 
 const resolvePath = (aliasPath: string) => {
-    const isDev = ENV.IS_DEV
+    // 💡 Ajuste: Use ENV.NODE_ENV para verificar o ambiente
+    const isDev = ENV.NODE_ENV === 'DEV'
     const rootDir = path.resolve(__dirname, '..')
     const _relativePath = aliasPath.replace(/^@\//, '')
     const finalPath = isDev ? path.resolve(rootDir, 'src', _relativePath) : path.resolve(rootDir, 'dist', _relativePath)

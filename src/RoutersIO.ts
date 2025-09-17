@@ -2,10 +2,11 @@
 import { Server, Socket } from 'socket.io'
 import path from 'path'
 import { rotasDinamicasIO } from '@/sockets/IO'
-import { ENV } from '@/config/env-config' // <-- Adicione esta linha
+import { ENV } from '@/config/env-config'
 
 const resolvePath = (aliasPath: string) => {
-    const isDev = ENV.IS_DEV
+    // 💡 A forma correta de verificar o ambiente agora é através de ENV.NODE_ENV
+    const isDev = ENV.NODE_ENV === 'DEV'
     const rootDir = path.resolve(__dirname, '..')
     const _relativePath = aliasPath.replace(/^@\//, '')
     const finalPath = isDev ? path.resolve(rootDir, 'src', _relativePath) : path.resolve(rootDir, 'dist', _relativePath)
@@ -15,7 +16,7 @@ const resolvePath = (aliasPath: string) => {
 type TTipoDataSocket = (data: any, socket: Socket, io?: Server) => Promise<void>
 
 export const RoutersIO = (io: Server) => {
-    
+
     io.on('connection', (socket: Socket) => {
         console.log('✅ ::: NOVO SOCKET ::::')
 
