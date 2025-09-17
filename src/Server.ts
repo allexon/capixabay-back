@@ -1,3 +1,4 @@
+// src/Server.ts
 import net from 'net'
 import express, { Express, Request, Response } from 'express'
 import { createServer } from 'http'
@@ -27,12 +28,10 @@ const startServer = async () => {
 
     // Lógica para permitir CORS
     const allowedOrigins = ENV.ALLOWED_ORIGINS
-    const devMobile = ENV.IS_DEV ? ENV.DEV_MOBILE : ''
-
     app.use((req: Request, res: Response, next: () => void) => {
         const origin = req.headers.origin || ''
 
-        const isAllowed = allowedOrigins.includes(origin) || (ENV.IS_DEV && origin.includes(devMobile))
+        const isAllowed = allowedOrigins.includes(origin)
 
         if (isAllowed) {
             res.header('Access-Control-Allow-Origin', origin)
@@ -55,7 +54,7 @@ const startServer = async () => {
     const io = new IOServer(httpServer, {
         cors: {
             origin: (origin, callback) => {
-                const isAllowed = allowedOrigins.includes(origin || '') || (ENV.IS_DEV && (origin || '').includes(devMobile))
+                const isAllowed = ENV.ALLOWED_ORIGINS.includes(origin || '')
                 callback(null, isAllowed)
                 console.log(`✅ Socket.IO CORS ${isAllowed ? 'permitido' : 'negado'} para: ${origin}`)
             },
@@ -81,6 +80,7 @@ const startServer = async () => {
         })
     })
 }
+
 
 const checkPort = (port: number) => new Promise<boolean>((resolve) => {
     const tester = net.createServer()

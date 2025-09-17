@@ -1,19 +1,18 @@
+// RoutersHTTP.ts
 import { Express, Request, Response } from 'express'
 import { Server as SocketIOServer } from 'socket.io'
 import path from 'path'
 import { PATH_HTTP } from '@/path-http/PATH-HTTP'
+import { ENV } from '@/config/env-config' // <-- Adicione esta linha
 
 type THttpHandler = (req: Request, res: Response, io: SocketIOServer) => void
 
 const resolvePath = (aliasPath: string) => {
-    const isDev = process.env.NODE_ENV === 'DEV';
-    const rootDir = path.resolve(__dirname, '..');
-    const _relativePath = aliasPath.replace(/^@\//, '');
-
-    const finalPath = isDev ? path.resolve(rootDir, 'src', _relativePath) : path.resolve(rootDir, 'dist', _relativePath);
-
-    // Assegura que o caminho é um .ts para dev e .js para prod
-    return isDev ? finalPath + '.ts' : finalPath + '.js';
+    const isDev = ENV.IS_DEV
+    const rootDir = path.resolve(__dirname, '..')
+    const _relativePath = aliasPath.replace(/^@\//, '')
+    const finalPath = isDev ? path.resolve(rootDir, 'src', _relativePath) : path.resolve(rootDir, 'dist', _relativePath)
+    return isDev ? finalPath + '.ts' : finalPath + '.js'
 }
 
 export const RoutersHTTP = (app: Express, io: SocketIOServer) => {

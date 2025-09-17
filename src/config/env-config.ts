@@ -4,51 +4,96 @@ import path from 'path'
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 
-const nodeEnv = process.env.NODE_ENV
-const isDev = nodeEnv === 'DEV'
-const isProd = nodeEnv === 'PROD'
-const isProdLocal = nodeEnv === 'PROD_LOCAL'
-
-// A porta do back-end
-let port: number
-if (isDev) {
-    port = Number(process.env.DEV_BACK_PORT)
-} else if (isProdLocal) {
-    port = Number(process.env.PROD_PORT_LOCAL)
-} else if (isProd) {
-    port = Number(process.env.PROD_PORT)
-} else {
-    port = Number(process.env.DEV_BACK_PORT)
+type EnvType = {
+    NODE_ENV: 'DEV' | 'PROD_LOCAL' | 'PROD'
+    DOMAIN: string
+    FRONT_PREFIX: string
+    BACK_PREFIX: string
+    PORT: number
+    ZOHO_EMAIL: string
+    ZOHO_PASSWORD: string
+    MONGO_DB_NAME: string
+    MONGODB_URL: string
+    DEV_MOBILE?: string
 }
 
-// Domínios
-const frontDomain = process.env.FRONT_PREFIX + '.' + process.env.DOMAIN
-const backDomain = process.env.BACK_PREFIX + '.' + process.env.DOMAIN
+const envMapping: Record<string, EnvType> = {
+    DEV: {
+        NODE_ENV: 'DEV',
+        DOMAIN: process.env.DEV_DOMAIN!,
+        FRONT_PREFIX: 'app',
+        BACK_PREFIX: 'back',
+        PORT: Number(process.env.DEV_PORT!),
+        ZOHO_EMAIL: process.env.DEV_ZOHO_EMAIL!,
+        ZOHO_PASSWORD: process.env.DEV_ZOHO_PASSWORD!,
+        MONGO_DB_NAME: process.env.DEV_LOCAL_MONGODB_NAME!,
+        MONGODB_URL: process.env.DEV_LOCAL_MONGODB_URL!,
+        DEV_MOBILE: process.env.DEV_MOBILE!,
+    },
+    PROD_LOCAL: {
+        NODE_ENV: 'PROD_LOCAL',
+        DOMAIN: process.env.PROD_LOCAL_DOMAIN!,
+        FRONT_PREFIX: 'app',
+        BACK_PREFIX: 'back',
+        PORT: Number(process.env.PROD_LOCAL_PORT!),
+        ZOHO_EMAIL: process.env.PROD_LOCAL_ZOHO_EMAIL!,
+        ZOHO_PASSWORD: process.env.PROD_LOCAL_ZOHO_PASSWORD!,
+        MONGO_DB_NAME: process.env.PROD_LOCAL_MONGODB_NAME!,
+        MONGODB_URL: process.env.PROD_LOCAL_MONGODB_URL!,
+    },
+    PROD: {
+        NODE_ENV: 'PROD',
+        DOMAIN: process.env.PROD_DOMAIN!,
+        FRONT_PREFIX: 'app',
+        BACK_PREFIX: 'back',
+        PORT: Number(process.env.PROD_PORT!),
+        ZOHO_EMAIL: process.env.PROD_ZOHO_EMAIL!,
+        ZOHO_PASSWORD: process.env.PROD_ZOHO_PASSWORD!,
+        MONGO_DB_NAME: process.env.PROD_MONGODB_NAME!,
+        MONGODB_URL: process.env.PROD_MONGODB_URL!,
+    },
+}
+
+// 🔑 Agora só precisa de 1 variável seletora
+const nodeEnv = process.env.NODE_ENV as EnvType['NODE_ENV'] || 'DEV'
+const envVars = envMapping[nodeEnv]
+
+if (!envVars) {
+    throw new Error(`Ambiente desconhecido: ${nodeEnv}`)
+}
+
+const isDev = envVars.NODE_ENV === 'DEV'
+const protocol = isDev ? 'http' : 'https'
+const frontPort = isDev ? `:${envVars.PORT - 1}` : ''
+const backPort = isDev ? `:${envVars.PORT}` : ''
 
 export const ENV = {
-    // Variáveis de ambiente
-    PORT: port,
-    MONGO_URL: isProd ? process.env.PROD_MONGODB as string : process.env.DEV_MONGODB as string,
-    MONGO_DB_NAME: process.env.MONGO_DB_NAME as string,
-    ZOHO_EMAIL: process.env.ZOHO_EMAIL as string,
-    ZOHO_PASSWORD: process.env.ZOHO_PASSWORD as string,
-    DEV_MOBILE: process.env.DEV_MOBILE as string,
+    PORT: envVars.PORT,
+    MONGO_URL: envVars.MONGODB_URL,
+    MONGO_DB_NAME: envVars.MONGO_DB_NAME,
+    ZOHO_EMAIL: envVars.ZOHO_EMAIL,
+    ZOHO_PASSWORD: envVars.ZOHO_PASSWORD,
+    DEV_MOBILE: envVars.DEV_MOBILE,
 
-    // Lógica do ambiente
     IS_DEV: isDev,
-    IS_PROD: isProd,
-    MODE: nodeEnv,
+    IS_PROD_LOCAL: envVars.NODE_ENV === 'PROD_LOCAL',
+    IS_PROD: envVars.NODE_ENV === 'PROD',
+    MODE: envVars.NODE_ENV,
 
-    // URLs da aplicação
-    FRONTEND_URL: isDev ? `http://${frontDomain}:${process.env.DEV_FRONT_PORT}` : `https://${frontDomain}`,
-    BACKEND_URL: isDev ? `http://${backDomain}:${process.env.DEV_BACK_PORT}` : `https://${backDomain}`,
+    FRONTEND_URL: isDev
+        ? `${protocol}://${envVars.DOMAIN}${frontPort}`
+        : `${protocol}://${envVars.FRONT_PREFIX}.${envVars.DOMAIN}`,
 
-    // CORS
+    BACKEND_URL: isDev
+        ? `${protocol}://${envVars.DOMAIN}${backPort}`
+        : `${protocol}://${envVars.BACK_PREFIX}.${envVars.DOMAIN}`,
+
     ALLOWED_ORIGINS: [
-        `http://${frontDomain}:${process.env.DEV_FRONT_PORT}`,
-        `http://localhost:${process.env.DEV_FRONT_PORT}`,
-        `http://127.0.0.1:${process.env.DEV_FRONT_PORT}`,
-        ...(isDev ? [`http://${process.env.DEV_MOBILE}:${process.env.DEV_FRONT_PORT}`] : []),
-        `http://${backDomain}:${port}` // Permite a comunicação do próprio back-end
-    ]
+        isDev
+            ? `${protocol}://${envVars.DOMAIN}${frontPort}`
+            : `${protocol}://${envVars.FRONT_PREFIX}.${envVars.DOMAIN}`,
+        `http://localhost:${envVars.PORT - 1}`,
+        `http://127.0.0.1:${envVars.PORT - 1}`,
+        ...(isDev && envVars.DEV_MOBILE ? [`http://${envVars.DEV_MOBILE}:${envVars.PORT - 1}`] : []),
+    ],
 }

@@ -1,21 +1,23 @@
+// RoutersIO.ts
 import { Server, Socket } from 'socket.io'
 import path from 'path'
 import { rotasDinamicasIO } from '@/sockets/IO'
+import { ENV } from '@/config/env-config' // <-- Adicione esta linha
 
 const resolvePath = (aliasPath: string) => {
-    const isDev = process.env.NODE_ENV === 'DEV';
-    const rootDir = path.resolve(__dirname, '..');
-    const _relativePath = aliasPath.replace(/^@\//, '');
-    const finalPath = isDev ? path.resolve(rootDir, 'src', _relativePath) : path.resolve(rootDir, 'dist', _relativePath);
-
-    return isDev ? finalPath + '.ts' : finalPath + '.js';
+    const isDev = ENV.IS_DEV
+    const rootDir = path.resolve(__dirname, '..')
+    const _relativePath = aliasPath.replace(/^@\//, '')
+    const finalPath = isDev ? path.resolve(rootDir, 'src', _relativePath) : path.resolve(rootDir, 'dist', _relativePath)
+    return isDev ? finalPath + '.ts' : finalPath + '.js'
 }
 
 type TTipoDataSocket = (data: any, socket: Socket, io?: Server) => Promise<void>
 
 export const RoutersIO = (io: Server) => {
+    
     io.on('connection', (socket: Socket) => {
-        console.log('✅ Novo cliente conectado')
+        console.log('✅ ::: NOVO SOCKET ::::')
 
         rotasDinamicasIO.forEach(({ canal, local, fn }) => {
             if (!local || !fn) {

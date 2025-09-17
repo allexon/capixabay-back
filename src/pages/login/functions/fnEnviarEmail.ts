@@ -1,4 +1,4 @@
-//src/login/sockets/functions/fnEnviarEmail.ts
+// src/login/sockets/functions/fnEnviarEmail.ts
 import nodemailer from 'nodemailer'
 import { ENV } from '@/config/env-config'
 
@@ -8,21 +8,18 @@ type TProps = {
 }
 
 export const fnEnviarEmail = async (props: TProps): Promise<boolean> => {
-    // Ajuste aqui para usar a variável NODE_ENV como 'PROD' ou 'DEV'
-    const ambiente = process.env.NODE_ENV === 'PROD' ? 'PROD' : 'DEV'
-
     const email = props.email_acesso?.trim() || null
     const codigo = props.codigo_acesso?.trim() || null
 
     if (!email || !codigo) {
         console.log('❌ Email ou código de acesso inválidos.', email, codigo)
-        return false;
+        return false
     }
 
     const transporter = nodemailer.createTransport({
         host: 'smtp.zoho.com',
         port: 587,
-        secure: false,
+        secure: false, // TLS
         auth: {
             user: ENV.ZOHO_EMAIL,
             pass: ENV.ZOHO_PASSWORD
@@ -46,8 +43,9 @@ export const fnEnviarEmail = async (props: TProps): Promise<boolean> => {
           <p>Se você não solicitou este código, ignore este e-mail.</p>
         </div>
       `
-        });
-        return !!_res
+        })
+
+        return !!_res.accepted && _res.accepted.length > 0
     } catch (error) {
         console.error('❌ Erro ao enviar e-mail:', error)
         return false

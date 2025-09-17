@@ -4,9 +4,9 @@
     "main": "dist/server.js",
     "scripts": {
         "dev": "cross-env NODE_ENV=DEV nodemon --watch src --ext ts,json --exec ts-node -r tsconfig-paths/register src/Server.ts",
-        "build": "tsc -b && tsc-alias",
+        "prod-local": "npm run build && cross-env NODE_ENV=PROD_LOCAL node dist/Server.js",
         "prod": "npm run build && cross-env NODE_ENV=PROD node dist/Server.js",
-        "dev:npx": "cross-env NODE_ENV=DEV npx ts-node -r tsconfig-paths/register src/Server.ts",
+        "build": "tsc -b && tsc-alias",
         "check-os-imports": "npx tsc --noEmit"
     },
     "type": "commonjs",
