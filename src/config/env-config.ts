@@ -17,6 +17,7 @@ const fnDev = (env: Record<string, string | undefined>) => {
 
     const allowedOrigins = [
         `http://app.${env.DEV_DOMAIN}:${portFront}`,
+        `http://back.${env.DEV_DOMAIN}:${portBack}`,
         'http://localhost',
         'http://127.0.0.1',
         env.DEV_MOBILE ? `http://${env.DEV_MOBILE}:${portFront}` : ''
@@ -51,7 +52,7 @@ const fnProdLocal = (env: Record<string, string | undefined>) => {
         MONGODB_URL: env.PROD_LOCAL_MONGODB_URL,
         FRONTEND_URL: `http://app.${domain}:${port}`,
         BACKEND_URL: `http://back.${domain}:${port}`,
-        ALLOWED_ORIGINS: [`http://app.${domain}:${port}`]
+        ALLOWED_ORIGINS: [`http://app.${domain}:${port}`, `http://back.${domain}:${port}`]
     }
 }
 
@@ -71,7 +72,7 @@ const fnProd = (env: Record<string, string | undefined>) => {
         MONGODB_URL: env.PROD_MONGODB_URL,
         FRONTEND_URL: `https://app.${domain}`,
         BACKEND_URL: `https://back.${domain}`,
-        ALLOWED_ORIGINS: [`https://app.${domain}`]
+        ALLOWED_ORIGINS: [`https://app.${domain}`, `https://back.${domain}`]
     }
 }
 

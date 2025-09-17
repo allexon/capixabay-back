@@ -3,12 +3,11 @@ import { Express, Request, Response } from 'express'
 import { Server as SocketIOServer } from 'socket.io'
 import path from 'path'
 import { PATH_HTTP } from '@/path-http/PATH-HTTP'
-import { ENV } from '@/config/env-config' // <-- Adicione esta linha
+import { ENV } from '@/config/env-config'
 
 type THttpHandler = (req: Request, res: Response, io: SocketIOServer) => void
 
 const resolvePath = (aliasPath: string) => {
-    // 💡 Ajuste: Use ENV.NODE_ENV para verificar o ambiente
     const isDev = ENV.NODE_ENV === 'DEV'
     const rootDir = path.resolve(__dirname, '..')
     const _relativePath = aliasPath.replace(/^@\//, '')
@@ -27,7 +26,10 @@ export const RoutersHTTP = (app: Express, io: SocketIOServer) => {
                 throw new Error(`Função '${fn}' não encontrada em '${local}'`)
             }
 
+            // 💡 CORREÇÃO AQUI:
+            // O fullPath deve ser apenas o caminho da URL, sem o domínio.
             const fullPath = `/api/${uri}`
+            console.log(':::: O QUE EM FULL PATH back :::: ', fullPath)
 
             if (method === 'GET') {
                 app.get(fullPath, (req, res) => {
