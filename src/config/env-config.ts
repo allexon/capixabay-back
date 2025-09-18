@@ -4,7 +4,7 @@ import path from 'path'
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 
-type TEnvKeys = 'DEV' | 'PROD_LOCAL' | 'PROD'
+type TEnvKeys = 'DEV' | 'LOCAL_PROD' | 'PROD'
 
 const fnDev = (env: Record<string, string | undefined>) => {
     const portBack = Number(env.DEV_PORT_BACK)
@@ -36,20 +36,20 @@ const fnDev = (env: Record<string, string | undefined>) => {
     }
 }
 
-const fnProdLocal = (env: Record<string, string | undefined>) => {
-    const port = Number(env.PROD_LOCAL_PORT)
-    const domain = env.PROD_LOCAL_DOMAIN!
+const fnLocalProd = (env: Record<string, string | undefined>) => {
+    const port = Number(env.LOCAL_PROD_PORT)
+    const domain = env.LOCAL_PROD_DOMAIN!
 
     // Exemplo de domínios completos:
     // -> http://app.capixabay.com.br:3002
     // -> http://back.capixabay.com.br:3002
     return {
-        NODE_ENV: 'PROD_LOCAL' as TEnvKeys,
+        NODE_ENV: 'LOCAL_PROD' as TEnvKeys,
         PORT: port,
-        ZOHO_EMAIL: env.PROD_LOCAL_ZOHO_EMAIL,
-        ZOHO_PASSWORD: env.PROD_LOCAL_ZOHO_PASSWORD,
-        MONGO_DB_NAME: env.PROD_LOCAL_MONGODB_NAME,
-        MONGODB_URL: env.PROD_LOCAL_MONGODB_URL,
+        ZOHO_EMAIL: env.LOCAL_PROD_ZOHO_EMAIL,
+        ZOHO_PASSWORD: env.LOCAL_PROD_ZOHO_PASSWORD,
+        MONGO_DB_NAME: env.LOCAL_PROD_MONGODB_NAME,
+        MONGODB_URL: env.LOCAL_PROD_MONGODB_URL,
         FRONTEND_URL: `http://app.${domain}:${port}`,
         BACKEND_URL: `http://back.${domain}:${port}`,
         ALLOWED_ORIGINS: [`http://app.${domain}:${port}`, `http://back.${domain}:${port}`]
@@ -81,7 +81,7 @@ let envConfig: ReturnType<typeof fnDev>
 
 switch (nodeEnv) {
     case 'DEV': envConfig = fnDev(process.env); break;
-    case 'PROD_LOCAL': envConfig = fnProdLocal(process.env); break;
+    case 'LOCAL_PROD': envConfig = fnLocalProd(process.env); break;
     case 'PROD': envConfig = fnProd(process.env); break;
     default: envConfig = fnDev(process.env); break;
 }
