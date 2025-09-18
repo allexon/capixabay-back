@@ -17,12 +17,12 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
     console.log(`Ambiente DB: ${ENV.NODE_ENV === 'PROD' ? 'Produção' : 'Desenvolvimento'}`)
 
     // ✅ Correção: A propriedade correta é MONGODB_URL
-    if (!ENV.MONGODB_URL) {
+    if (!ENV.MONGO_DB_URL) {
         throw new Error('Variável de ambiente MONGODB_URL não está definida. Verifique o seu arquivo .env.')
     }
 
     // ✅ Correção: A propriedade correta é MONGODB_URL
-    _mongoClient = new MongoClient(ENV.MONGODB_URL, {
+    _mongoClient = new MongoClient(ENV.MONGO_DB_URL, {
         serverSelectionTimeoutMS: 1000,
         heartbeatFrequencyMS: 1000,
         retryWrites: true,
