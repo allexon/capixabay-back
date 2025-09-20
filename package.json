@@ -5,12 +5,12 @@
     "scripts": {
         "dev": "cross-env NODE_ENV=DEV nodemon --watch src --ext ts,json --exec ts-node -r tsconfig-paths/register src/Server.ts",
         "local-prod": "npm run build && npm run deploy-local-prod",
+        "deploy-local-prod": "bash ./src/config/deploy-local-prod.sh LOCAL-PROD",
         "prod": "npm run build && npm run deploy-prod",
+        "deploy-prod": "bash ./src/config/deploy-prod.sh PROD",
         "build": "tsc -b && tsc-alias",
-        "deploy-local-prod": "bash ./deploy.sh LOCAL-PROD",
-        "deploy-prod": "bash ./deploy.sh PROD",
-        "check-os-imports": "npx tsc --noEmit",
-        "local-prod-test": "cross-env NODE_ENV=LOCAL-PROD node dist/Server.js"
+        "local-prod-test": "cross-env NODE_ENV=LOCAL-PROD node dist/Server.js",
+        "check-os-imports": "npx tsc --noEmit"
     },
     "type": "commonjs",
     "dependencies": {

@@ -8,7 +8,7 @@ set -e
 
 # --- Configuração ---
 DEPLOY_DIR="/media/HD-AUXILIAR/makertools/apps/capixabay/deploy"
-DEPLOY_TARGET_DIR="$DEPLOY_DIR/backend"
+DEPLOY_TARGET_DIR="$DEPLOY_DIR/backend/local-prod"
 ENV_SOURCE_FILE=".env.local-prod"
 
 # --- Início do Script ---
