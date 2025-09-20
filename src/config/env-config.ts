@@ -90,6 +90,18 @@ const fnLocalProd = (env: Record<string, string | undefined>): TEnvConfig => {
     const domain = env.LOCAL_PROD_DOMAIN!
     const ip = env.LOCAL_PROD_MOBILE
 
+    // 1. Primeiro, criamos a lista de origens permitidas
+    const allowedOrigins = [
+        `http://app.${domain}`,
+        `http://app.${domain}:${portBack}`,
+        `http://back.${domain}:${portBack}`,
+        ip ? `http://${ip}:${portBack}` : undefined
+    ].filter(Boolean) as string[];
+
+    // 2. AGORA SIM, nós imprimimos a lista que acabamos de criar
+    console.log('--- DIAGNÓSTICO DE ORIGENS PERMITIDAS ---', allowedOrigins);
+
+    // 3. Finalmente, retornamos o objeto de configuração
     return {
         NODE_ENV: 'LOCAL-PROD',
         PORT: portBack,
@@ -103,7 +115,7 @@ const fnLocalProd = (env: Record<string, string | undefined>): TEnvConfig => {
         front_IP: ip ? `http://${ip}:${portBack}` : undefined,
         back_IP: ip ? `http://${ip}:${portBack}` : undefined,
         wsFrontBack_IP: ip ? `ws://${ip}:${portBack}` : undefined,
-        ALLOWED_ORIGINS: [`http://app.${domain}:${portBack}`, `http://back.${domain}:${portBack}`, ip ? `http://${ip}:${portBack}` : undefined].filter(Boolean) as string[]
+        ALLOWED_ORIGINS: allowedOrigins // Usamos a variável aqui
     }
 }
 

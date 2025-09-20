@@ -7,12 +7,27 @@ import { ENV } from '@/config/env-config'
 
 type THttpHandler = (req: Request, res: Response, io: SocketIOServer) => void
 
+/*
 const resolvePath = (aliasPath: string) => {
     const isDev = ENV.NODE_ENV === 'DEV'
     const rootDir = path.resolve(__dirname, '..')
     const _relativePath = aliasPath.replace(/^@\//, '')
     const finalPath = isDev ? path.resolve(rootDir, 'src', _relativePath) : path.resolve(rootDir, 'dist', _relativePath)
     return isDev ? finalPath + '.ts' : finalPath + '.js'
+}
+*/
+
+const resolvePath = (aliasPath: string) => {
+    const isDev = ENV.NODE_ENV === 'DEV';
+    const relativePath = aliasPath.replace(/^@\//, ''); // Remove o '@/' -> 'pages/login/Login'
+
+    if (isDev) {
+        // Em DEV, o __dirname está em /dist/config. Subimos 2 níveis para a raiz e entramos em /src
+        return path.join(__dirname, '..', '..', 'src', relativePath + '.ts');
+    } else {
+        // Em PROD, o __dirname está em /deploy/backend/config. Subimos 1 nível para /deploy/backend
+        return path.join(__dirname, '..', relativePath + '.js');
+    }
 }
 
 export const RoutersHTTP = (app: Express, io: SocketIOServer) => {

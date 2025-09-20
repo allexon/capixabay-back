@@ -4,6 +4,7 @@ import path from 'path'
 import { rotasDinamicasIO } from '@/sockets/IO'
 import { ENV } from '@/config/env-config'
 
+/*
 const resolvePath = (aliasPath: string) => {
     // 💡 A forma correta de verificar o ambiente agora é através de ENV.NODE_ENV
     const isDev = ENV.NODE_ENV === 'DEV'
@@ -11,6 +12,20 @@ const resolvePath = (aliasPath: string) => {
     const _relativePath = aliasPath.replace(/^@\//, '')
     const finalPath = isDev ? path.resolve(rootDir, 'src', _relativePath) : path.resolve(rootDir, 'dist', _relativePath)
     return isDev ? finalPath + '.ts' : finalPath + '.js'
+}
+*/
+
+const resolvePath = (aliasPath: string) => {
+    const isDev = ENV.NODE_ENV === 'DEV';
+    const relativePath = aliasPath.replace(/^@\//, ''); // Remove o '@/' -> 'pages/login/Login'
+
+    if (isDev) {
+        // Em DEV, o __dirname está em /dist/config. Subimos 2 níveis para a raiz e entramos em /src
+        return path.join(__dirname, '..', '..', 'src', relativePath + '.ts');
+    } else {
+        // Em PROD, o __dirname está em /deploy/backend/config. Subimos 1 nível para /deploy/backend
+        return path.join(__dirname, '..', relativePath + '.js');
+    }
 }
 
 type TTipoDataSocket = (data: any, socket: Socket, io?: Server) => Promise<void>
