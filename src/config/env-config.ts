@@ -1,4 +1,4 @@
-// src/config/env-config.ts
+// src/config/env-config.ts (backend)
 import dotenv from 'dotenv'
 import path from 'path'
 
@@ -87,7 +87,7 @@ const createConfig = (): TEnvConfig => {
             NODE_ENV: 'PROD', PORT, ZOHO_EMAIL, ZOHO_PASSWORD, MONGO_DB_NAME, MONGO_DB_URL,
             front: `https://app.${domain}`,
             back: `https://back.${domain}`,
-            wsFrontBack: `wss://back.${domain}`,
+            wsFrontBack: `wss://back.${domain}`,            
             ALLOWED_ORIGINS: [`https://app.${domain}`, `https://back.${domain}`]
         }
     }
