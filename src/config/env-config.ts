@@ -24,7 +24,6 @@ type TEnvConfig = {
 let instance: TEnvConfig | null = null
 
 const createConfig = (): TEnvConfig => {
-    console.log('--- CRIANDO CONFIGURAÇÃO DE AMBIENTE PELA PRIMEIRA VEZ ---')
 
     // Lógica para carregar o arquivo .env apenas em ambiente DEV
     if (process.env.NODE_ENV === 'DEV' && !process.env.PORT_BACK) {

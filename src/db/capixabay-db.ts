@@ -1,4 +1,3 @@
-// src/db/capixabay-db.ts
 import { MongoClient, Db, ReadConcern } from 'mongodb'
 import { ENV } from '@/config/env-config' // Importa a configuração unificada
 
@@ -14,8 +13,6 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
         return { client: _mongoClient, db: _db }
     }
 
-    // A partir daqui, o código não precisa mais saber qual é o ambiente (DEV, PROD, etc.).
-    // Ele apenas consome as propriedades corretas do objeto ENV.
     console.log(`Ambiente DB: ${ENV.NODE_ENV}`)
 
     // 1. Valida se a URL do MongoDB existe no objeto ENV.
@@ -27,20 +24,25 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
     if (!ENV.MONGO_DB_NAME) {
         throw new Error('Variável de ambiente MONGO_DB_NAME não está definida. Verifique o seu env-config.ts.')
     }
-    
-    // 3. Usa a propriedade MONGO_DB_URL diretamente do objeto ENV.
-    _mongoClient = new MongoClient(ENV.MONGO_DB_URL + '?verbose=true', {
-        serverSelectionTimeoutMS: 10000, // dá mais tempo pro Atlas responder
+
+    // Assegura que o certificado raiz é confiável e que a negociação de TLS está habilitada.
+    // O driver já lida com o TLS para `mongodb+srv`.
+    const clientOptions: any = {
+        serverSelectionTimeoutMS: 10000,
         heartbeatFrequencyMS: 10000,
         retryWrites: true,
         retryReads: true,
-        ssl: ENV.NODE_ENV === 'PROD'? true : false,
+        tls: true, // Adicionando 'tls' para negociação explícita
         tlsAllowInvalidCertificates: false, // não aceita certificado inválido
         readConcern: new ReadConcern('majority'),
         writeConcern: { w: 'majority', wtimeoutMS: 5000 },
         maxPoolSize: 10,
         minPoolSize: 2
-    })
+    }
+
+    // 3. Usa a propriedade MONGO_DB_URL diretamente do objeto ENV.
+    // Removendo o parametro verbose da URL para testar
+    _mongoClient = new MongoClient(ENV.MONGO_DB_URL, clientOptions)
 
     try {
         await _mongoClient.connect()
