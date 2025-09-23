@@ -28,7 +28,7 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
     // Assegura que o certificado raiz é confiável e que a negociação de TLS está habilitada.
     // O driver já lida com o TLS para `mongodb+srv`.
     const clientOptions: any = {
-        serverSelectionTimeoutMS: 10000,
+        serverSelectionTimeoutMS: 30000,
         heartbeatFrequencyMS: 10000,
         retryWrites: true,
         retryReads: true,
@@ -37,7 +37,9 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
         readConcern: new ReadConcern('majority'),
         writeConcern: { w: 'majority', wtimeoutMS: 5000 },
         maxPoolSize: 10,
-        minPoolSize: 2
+        minPoolSize: 2,
+        family: 4,  // Força IPv4 (evita tentativas IPv6)
+        autoSelectFamily: false
     }
 
     // 3. Usa a propriedade MONGO_DB_URL diretamente do objeto ENV.
@@ -51,7 +53,7 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
         console.log(`✅ Conexão com MongoDB (${ENV.MONGO_DB_NAME}) estabelecida com sucesso!`)
         return { client: _mongoClient, db: _db }
     } catch (err) {
-        console.error('❌ Falha ao conectar ao MongoDB:', err)
+        console.error('❌ ::: Falha ao conectar ao MongoDB ::::', err)
         if (_mongoClient) {
             await _mongoClient.close().catch(e => console.error("Erro ao fechar cliente MongoDB:", e))
             _mongoClient = null
