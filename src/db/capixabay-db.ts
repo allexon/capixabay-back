@@ -27,9 +27,9 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
     if (!ENV.MONGO_DB_NAME) {
         throw new Error('Variável de ambiente MONGO_DB_NAME não está definida. Verifique o seu env-config.ts.')
     }
-
+    
     // 3. Usa a propriedade MONGO_DB_URL diretamente do objeto ENV.
-    _mongoClient = new MongoClient(ENV.MONGO_DB_URL, {
+    _mongoClient = new MongoClient(ENV.MONGO_DB_URL + '?verbose=true', {
         serverSelectionTimeoutMS: 10000, // dá mais tempo pro Atlas responder
         heartbeatFrequencyMS: 10000,
         retryWrites: true,

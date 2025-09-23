@@ -9,7 +9,7 @@ set -e
 # --- Configuração ---
 # O diretório onde o build será preparado antes de ser enviado para a AWS
 DEPLOY_DIR="/media/HD-AUXILIAR/makertools/apps/capixabay/deploy"
-DEPLOY_TARGET_DIR="$DEPLOY_DIR/backend/prod"
+DEPLOY_TARGET_DIR="$DEPLOY_DIR/backend"
 ENV_SOURCE_FILE=".env.prod" # O arquivo .env.prod está na raiz do projeto.
 
 # --- Início do Script ---
