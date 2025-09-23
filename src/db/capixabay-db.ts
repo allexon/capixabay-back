@@ -34,7 +34,7 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
         heartbeatFrequencyMS: 10000,
         retryWrites: true,
         retryReads: true,
-        ssl: true, // garante que TLS será usado
+        ssl: ENV.NODE_ENV === 'PROD'? true : false,
         tlsAllowInvalidCertificates: false, // não aceita certificado inválido
         readConcern: new ReadConcern('majority'),
         writeConcern: { w: 'majority', wtimeoutMS: 5000 },
