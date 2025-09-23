@@ -39,6 +39,7 @@ export const fnStartColletions = (db: Db): void => {
     collections[Enun.USUARIOS] = db.collection(Enun.USUARIOS)
     collections[Enun.EMPRESAS] = db.collection(Enun.EMPRESAS)    
     collections[Enun.ROTAS] = db.collection(Enun.ROTAS)    
+    collections[Enun.PRODUTOS] = db.collection(Enun.PRODUTOS)
     collections[Enun.PEDIDOS] = db.collection(Enun.PEDIDOS)    
     collections[Enun.MENU_PRINCIPAL] = db.collection(Enun.MENU_PRINCIPAL)
 }
@@ -58,12 +59,12 @@ export const fnGetCollectionsFromDb = (db: Db): { [K in Enun]: Collection<Types[
 export const fnGetCollections = (db?: Db): { [K in Enun]: Collection<Types[K]> } => {
     if (db) return fnGetCollectionsFromDb(db)
     if (
-        !collections[Enun.USUARIOS]      ||
-        !collections[Enun.AUTORIZACOES]  ||
-        !collections[Enun.EMPRESAS]      ||        
-        !collections[Enun.ROTAS]         ||        
-        !collections[Enun.PRODUTOS]      ||
-        !collections[Enun.PEDIDOS]       ||        
+        !collections[Enun.USUARIOS] ||
+        !collections[Enun.AUTORIZACOES] ||
+        !collections[Enun.EMPRESAS] ||        
+        !collections[Enun.ROTAS] ||        
+        !collections[Enun.PRODUTOS] ||
+        !collections[Enun.PEDIDOS] ||        
         !collections[Enun.MENU_PRINCIPAL]
     ) {
         throw new Error('Coleções globais não inicializadas.')
@@ -77,8 +78,14 @@ export const fnConnectAndInitCollections = async (): Promise<void> => {
     fnStartColletions(db)
 }
 
-// ✅ NOVA FUNÇÃO: Conecta e já retorna as coleções diretamente
+// [ALTERAÇÃO]: Adiciona verificação e log para garantir conexão
 export const fnConnectDirectCollection = async (): Promise<{ [K in Enun]: Collection<Types[K]> }> => {
+    console.log('🔄 Iniciando fnConnectDirectCollection...')
     const { db } = await fnConnectMongoDb()
+    if (!db) {
+        console.error('❌ Banco de dados não conectado em fnConnectDirectCollection')
+        throw new Error('Banco de dados não conectado.')
+    }
+    console.log('✅ Banco de dados conectado, retornando coleções.')
     return fnGetCollectionsFromDb(db)
 }

@@ -4,8 +4,7 @@ import { rotasDinamicasIO } from '@/sockets/IO'
 
 type TTipoDataSocket = (data: any, socket: Socket, io?: Server) => Promise<void>
 
-export const RoutersIO = (io: Server) => {
-
+export const RoutersIO = async (io: Server) => {
     io.on('connection', (socket: Socket) => {
         console.log('✅ ::: NOVO SOCKET ::::')
 
@@ -17,8 +16,6 @@ export const RoutersIO = (io: Server) => {
 
             socket.on(canal, async (data: any) => {
                 try {
-                    // A função 'resolvePath' foi removida.
-                    // Usamos o 'local' (que contém o alias '@') diretamente.
                     const _import = await import(local)
                     const _handler = _import[fn] as TTipoDataSocket
 
@@ -31,7 +28,6 @@ export const RoutersIO = (io: Server) => {
                     } else {
                         await _handler(data, socket)
                     }
-
                 } catch (error) {
                     console.error(`❌ Erro no canal [${canal}] vindo de [${local}]`, error)
                 }

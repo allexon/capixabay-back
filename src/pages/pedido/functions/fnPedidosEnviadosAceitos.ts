@@ -1,21 +1,28 @@
-//src/pages/pedido/functions/fnPedidosEnviadosAceitos.ts
+// src/pages/pedido/functions/fnPedidosEnviadosAceitos.ts
 import { fnConnectDirectCollection } from '@/db/capixabay-collections'
 import { ReadConcern, ReadPreference } from 'mongodb'
 import { pedidosEnviadosAceitosStates, type TPedidosEnviadosAceitos } from '@/pages/pedido/types/TPedidosEnviadosAceitos'
 
 export const fnPedidosEnviadosAceitos = async (usuario_id: string): Promise<TPedidosEnviadosAceitos> => {
+    // [ALTERAÇÃO]: Log para confirmar início
+    console.log(`🔍 Iniciando fnPedidosEnviadosAceitos para usuario_id: ${usuario_id}`)
     const { PEDIDOS } = await fnConnectDirectCollection()
+    console.log('✅ Coleção PEDIDOS obtida com sucesso')
+
     const replicaSetParams = {
         readConcern: new ReadConcern('majority'),
         readPreference: ReadPreference.primaryPreferred
     }
 
+    // [ALTERAÇÃO]: Log antes da query
+    console.log('🔄 Executando query na coleção PEDIDOS')
     const pedidos = await PEDIDOS.find({
         $or: [
             { 'produtos.usuario_comprador_id': usuario_id },
             { 'produtos.usuario_vendedor_id': usuario_id },
         ],
     }, replicaSetParams).toArray()
+    console.log(`✅ Encontrados ${pedidos.length} pedidos`)
 
     const result: TPedidosEnviadosAceitos = { ...pedidosEnviadosAceitosStates, usuario_id }
 
@@ -65,7 +72,6 @@ export const fnPedidosEnviadosAceitos = async (usuario_id: string): Promise<TPed
         
         if (prod.produto_status === 'ENVIADO' || prod.produto_status === 'ACEITO') {
             if (isComprador && isVendedor) {
-                // Cenário de autocompra (compra e venda)
                 result.total_pedidos_qtde++
                 result.total_compras_qtde++
                 result.total_vendas_qtde++
@@ -74,16 +80,12 @@ export const fnPedidosEnviadosAceitos = async (usuario_id: string): Promise<TPed
                     result.total_vendas_enviados_qtde++
                 }
                 if (prod.produto_status === 'ACEITO') result.total_compras_aceitos_qtde++
-
             } else if (isComprador) {
-                // Cenário de apenas compra
                 result.total_pedidos_qtde++
                 result.total_compras_qtde++
                 if (prod.produto_status === 'ENVIADO') result.total_compras_enviados_qtde++
                 if (prod.produto_status === 'ACEITO') result.total_compras_aceitos_qtde++
-
             } else if (isVendedor) {
-                // Cenário de apenas venda (contamos apenas ENVIADO)
                 result.total_pedidos_qtde++
                 result.total_vendas_qtde++
                 result.total_vendas_enviados_qtde++
@@ -93,5 +95,6 @@ export const fnPedidosEnviadosAceitos = async (usuario_id: string): Promise<TPed
     })
     
     result.pedidos = pedidosAtualizados
+    console.log('✅ Retornando resultado de fnPedidosEnviadosAceitos')
     return result
 }

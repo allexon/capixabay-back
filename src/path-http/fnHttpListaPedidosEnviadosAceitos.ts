@@ -1,3 +1,4 @@
+// src/path-http/fnHttpListaPedidosEnviadosAceitos.ts
 console.log('..http totalizacoes...')
 import { Request, Response } from 'express'
 import { fnPedidosEnviadosAceitos } from '@/pages/pedido/functions/fnPedidosEnviadosAceitos'
@@ -17,7 +18,11 @@ export const fnHttpListaPedidosEnviadosAceitos = async (req: Request, res: Respo
         console.log('✅ Resultado obtido:', result)
         return res.json({ status: 'ok', data: Array.isArray(result) ? result : result })
     } catch (error: any) {
-        console.error('❌ Erro em fnHttpListaPedidosEnviadosAceitos:', error.message)
+        // [ALTERAÇÃO]: Log detalhado do erro
+        console.error('❌ Erro em fnHttpListaPedidosEnviadosAceitos:', {
+            message: error.message,
+            stack: error.stack
+        })
         return res.status(500).json({ status: 'error', message: 'Erro ao processar totalizações' })
     }
 }

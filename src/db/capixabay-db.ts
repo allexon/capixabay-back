@@ -1,5 +1,6 @@
+// src/db/capixabay-db.ts
 import { MongoClient, Db, ReadConcern } from 'mongodb'
-import { ENV } from '@/config/env-config' // Importa a configuração unificada
+import { ENV } from '@/config/env-config'
 
 let _mongoClient: MongoClient | null = null
 let _db: Db | null = null
@@ -10,6 +11,7 @@ let _db: Db | null = null
 export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db }> => {
     // Se já existe uma conexão ativa, a reutiliza.
     if (_mongoClient && _db) {
+        console.log('🔄 Reutilizando conexão existente com MongoDB')
         return { client: _mongoClient, db: _db }
     }
 
@@ -44,16 +46,20 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
 
     // 3. Usa a propriedade MONGO_DB_URL diretamente do objeto ENV.
     // Removendo o parametro verbose da URL para testar
+    console.log(`🔗 Tentando conectar ao MongoDB: ${ENV.MONGO_DB_URL.replace(/:([^@]+)@/, ':****@')}`)
     _mongoClient = new MongoClient(ENV.MONGO_DB_URL, clientOptions)
 
     try {
         await _mongoClient.connect()
-        // 4. Usa a propriedade MONGO_DB_NAME diretamente do objeto ENV.
         _db = _mongoClient.db(ENV.MONGO_DB_NAME)
         console.log(`✅ Conexão com MongoDB (${ENV.MONGO_DB_NAME}) estabelecida com sucesso!`)
         return { client: _mongoClient, db: _db }
-    } catch (err) {
-        console.error('❌ ::: Falha ao conectar ao MongoDB ::::', err)
+    } catch (err: any) {
+        console.error('❌ ::: Falha ao conectar ao MongoDB ::::', {
+            message: err.message,
+            stack: err.stack,
+            url: ENV.MONGO_DB_URL.replace(/:([^@]+)@/, ':****@')
+        })
         if (_mongoClient) {
             await _mongoClient.close().catch(e => console.error("Erro ao fechar cliente MongoDB:", e))
             _mongoClient = null

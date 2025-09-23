@@ -71,8 +71,8 @@ const startServer = async () => {
         pingTimeout: 5000,
     })
 
-    RoutersIO(io)
-    RoutersHTTP(app, io)
+    await RoutersIO(io)
+    await RoutersHTTP(app, io)
 
     httpServer.listen(PORT, '0.0.0.0', () => {
         console.log(`🚀 Servidor Socket.IO e HTTP rodando na porta ${PORT}!`)

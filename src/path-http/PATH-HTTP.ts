@@ -1,17 +1,15 @@
-export type THTTPRoute = {
+interface RouteConfig {
     uri: string
     local: string
     fn: string
     method?: 'GET' | 'POST'
 }
 
-const pathHTTP: THTTPRoute[] = [
+export const PATH_HTTP: RouteConfig[] = [
     {
         uri: 'lista-pedidos-enviados-aceitos',
-        local: '@/pages/pedido/http/fnHttpListaPedidosEnviadosAceitos',
+        local: '@/path-http/fnHttpListaPedidosEnviadosAceitos',
         fn: 'fnHttpListaPedidosEnviadosAceitos',
-        method: 'POST',
-    }    
+        method: 'POST'
+    }
 ]
-
-export const PATH_HTTP = pathHTTP
