@@ -30,10 +30,12 @@ export const fnConnectMongoDb = async (): Promise<{ client: MongoClient; db: Db 
 
     // 3. Usa a propriedade MONGO_DB_URL diretamente do objeto ENV.
     _mongoClient = new MongoClient(ENV.MONGO_DB_URL, {
-        serverSelectionTimeoutMS: 5000, // Aumentado para dar mais tempo em redes lentas
+        serverSelectionTimeoutMS: 10000, // dá mais tempo pro Atlas responder
         heartbeatFrequencyMS: 10000,
         retryWrites: true,
         retryReads: true,
+        ssl: true, // garante que TLS será usado
+        tlsAllowInvalidCertificates: false, // não aceita certificado inválido
         readConcern: new ReadConcern('majority'),
         writeConcern: { w: 'majority', wtimeoutMS: 5000 },
         maxPoolSize: 10,
