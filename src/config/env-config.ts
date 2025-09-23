@@ -27,13 +27,11 @@ const createConfig = (): TEnvConfig => {
     console.log('--- CRIANDO CONFIGURAÇÃO DE AMBIENTE PELA PRIMEIRA VEZ ---')
 
     // Lógica para carregar o arquivo .env apenas em ambiente DEV
-    // Verifica se NODE_ENV é 'DEV' e se as variáveis ainda não foram carregadas (ex: PORT_BACK)
     if (process.env.NODE_ENV === 'DEV' && !process.env.PORT_BACK) {
         const envFile = `.env.${process.env.NODE_ENV.toLowerCase()}`
         dotenv.config({ path: path.resolve(process.cwd(), envFile) })
         console.log(`💡 Variáveis de ambiente de ${envFile} carregadas para o ambiente DEV.`)
     }
-    // Em LOCAL-PROD e PROD, as variáveis já vêm do capixabay.sh ou do ambiente do servidor, então não fazemos nada aqui.
 
     const nodeEnv = (process.env.NODE_ENV?.toUpperCase().replace('_', '-') || 'DEV') as TEnvKeys
 
@@ -43,6 +41,16 @@ const createConfig = (): TEnvConfig => {
     const MONGO_DB_NAME = process.env.MONGO_DB_NAME
     const MONGO_DB_URL = process.env.MONGO_DB_URL
 
+    /*
+    DEV:
+        - front:          http://app.localhost:3000
+        - back:           http://back.localhost:3001
+        - wsFrontBack:    ws://back.localhost:3001
+
+        - front_IP:       http://192.168.0.6:3000
+        - back_IP:        http://192.168.0.6:3001
+        - wsFrontBack_IP: ws://192.168.0.6:3001
+    */
     if (nodeEnv === 'DEV') {
         const portFront = Number(process.env.DEV_PORT_FRONT)
         const domain = process.env.DEV_DOMAIN!
@@ -56,10 +64,26 @@ const createConfig = (): TEnvConfig => {
             front_IP: ip ? `http://${ip}:${portFront}` : undefined,
             back_IP: ip ? `http://${ip}:${PORT}` : undefined,
             wsFrontBack_IP: ip ? `ws://${ip}:${PORT}` : undefined,
-            ALLOWED_ORIGINS: [`http://app.${domain}:${portFront}`, `http://back.${domain}:${PORT}`, 'http://localhost', 'http://127.0.0.1', ip ? `http://${ip}:${portFront}` : ''].filter(Boolean) as string[]
+            ALLOWED_ORIGINS: [
+                `http://app.${domain}:${portFront}`,
+                `http://back.${domain}:${PORT}`,
+                'http://localhost',
+                'http://127.0.0.1',
+                ip ? `http://${ip}:${portFront}` : ''
+            ].filter(Boolean) as string[]
         }
     }
 
+    /*
+    LOCAL-PROD:
+        - front:          http://app.capixabay.com.br:3002
+        - back:           http://back.capixabay.com.br:3002
+        - wsFrontBack:    ws://back.capixabay.com.br:3002
+
+        - front_IP:       http://192.168.0.6:3002
+        - back_IP:        http://192.168.0.6:3002
+        - wsFrontBack_IP: ws://192.168.0.6:3002
+    */
     if (nodeEnv === 'LOCAL-PROD') {
         const domain = process.env.LOCAL_PROD_DOMAIN!
         const ip = process.env.LOCAL_PROD_MOBILE
@@ -77,10 +101,21 @@ const createConfig = (): TEnvConfig => {
             front_IP: ip ? `http://${ip}:${PORT}` : undefined,
             back_IP: ip ? `http://${ip}:${PORT}` : undefined,
             wsFrontBack_IP: ip ? `ws://${ip}:${PORT}` : undefined,
-            ALLOWED_ORIGINS: [`http://app.${domain}`, `http://app.${domain}:${PORT}`, `http://back.${domain}:${PORT}`, ip ? `http://${ip}:${PORT}` : undefined].filter(Boolean) as string[]
+            ALLOWED_ORIGINS: [
+                `http://app.${domain}`,
+                `http://app.${domain}:${PORT}`,
+                `http://back.${domain}:${PORT}`,
+                ip ? `http://${ip}:${PORT}` : undefined
+            ].filter(Boolean) as string[]
         }
     }
 
+    /*
+    PROD:
+        - front:          https://app.capixabay.com.br
+        - back:           https://back.capixabay.com.br
+        - wsFrontBack:    wss://back.capixabay.com.br
+    */
     if (nodeEnv === 'PROD') {
         const domain = process.env.PROD_DOMAIN!
         return {
@@ -88,7 +123,10 @@ const createConfig = (): TEnvConfig => {
             front: `https://app.${domain}`,
             back: `https://back.${domain}`,
             wsFrontBack: `wss://back.${domain}`,            
-            ALLOWED_ORIGINS: [`https://app.${domain}`, `https://back.${domain}`]
+            ALLOWED_ORIGINS: [
+                `https://app.${domain}`, 
+                `https://back.${domain}`
+            ]
         }
     }
 
@@ -114,5 +152,3 @@ const getConfig = (): TEnvConfig => {
 
 export const ENV = getConfig()
 // --- Fim do Padrão Singleton ---
-
-
