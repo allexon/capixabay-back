@@ -6,13 +6,7 @@ import path from 'path'
 type THttpHandler = (req: Request, res: Response, io: SocketIOServer) => void
 
 export const RoutersHTTP = async (app: Express, io: SocketIOServer) => {
-    for (const { uri, local, fn, method = 'GET' } of PATH_HTTP) {
-        console.log(`
-            uri: ${uri}
-            locaL: ${local} 
-            fn: ${fn} 
-            method: ${method}
-        `)
+    for (const { uri, local, fn, method = 'GET' } of PATH_HTTP) {    
         try {
             // 🔑 monta caminho absoluto (funciona no dev e no build)
             const correctedLocal = local.replace(/^@\//, '') // remove @/ se houver
