@@ -59,6 +59,7 @@ export const UsuarioCorrente = async (req: TReqUsuarioCorrente, socket: Socket) 
                 autorizacao_id: autorizacao ? String(autorizacao._id) : '',
                 autorizacao_email_acesso: autorizacao?.email_acesso ?? '',
                 autorizacao_numero_acesso: autorizacao?.numero_acessos ?? 0,
+                autorizacao_usuario_cadastro_completo: autorizacao?.usuario_cadastro_completo ?? false                
             },
 
             usuario: usuario

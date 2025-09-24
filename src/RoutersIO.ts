@@ -6,7 +6,7 @@ type TTipoDataSocket = (data: any, socket: Socket, io?: Server) => Promise<void>
 
 export const RoutersIO = async (io: Server) => {
     io.on('connection', (socket: Socket) => {
-        console.log('✅ ::: NOVO SOCKET ::::')
+        //console.log('✅ ::: NOVO SOCKET ::::')
 
         rotasDinamicasIO.forEach(({ canal, local, fn }) => {
             if (!local || !fn) {

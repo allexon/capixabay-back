@@ -9,12 +9,12 @@ export const fnAutorizacaoInsert = async (email_acesso: string | null) => {
   const fnGerarCodigoAcesso = () => Math.floor(100000 + Math.random() * 900000).toString()
 
   const _data: TAutorizacao = {
-    ...autorizacaoValuesDefault,          // valores default
-    _id: new ObjectId().toHexString(),    // string compatível front/back
+    ...autorizacaoValuesDefault,
+    _id: new ObjectId(),
     email_acesso: email_acesso,   
     codigo_acesso: fnGerarCodigoAcesso(),
-    criado_em: new Date(),                // Date correto
-    atualizado_em: new Date()             // Date correto
+    criado_em: new Date(),
+    atualizado_em: new Date()
   }
 
   try {

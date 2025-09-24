@@ -9,6 +9,8 @@ import { fnUpdateUsuario } from '@/pages/usuario/functions/fnUsuarioUpdate'
 //*************************** FUNÇÃO PRINCIPAL  ***************************/
 export const Usuario = async (req: any, socket: Socket) => {
 
+        console.log('::: 1 DADOS DO USUARIO :::::', req)
+
     // Ajuste: verifica se veio data ou veio direto o objeto
     const data = req.data ?? req
 
@@ -22,7 +24,7 @@ export const Usuario = async (req: any, socket: Socket) => {
     try {
         // Procura na Coleção USUARIOS o USUARIO -> AUTORIZACAO ID
         const usuario = await fnProcurarUsuario(autorizacao_id) // retorna os dados do usuario
-        console.log('::: DADOS DO USUARIO :::::', usuario)
+        console.log('::: 2 DADOS DO USUARIO :::::', usuario)
 
         // UPDATE USUARIO
         if (usuario) {

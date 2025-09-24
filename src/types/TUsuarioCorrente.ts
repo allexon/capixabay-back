@@ -58,6 +58,7 @@ export type TUsuarioCorrente = {
         autorizacao_id: string
         autorizacao_email_acesso: string | null
         autorizacao_numero_acesso: number | null
+        autorizacao_usuario_cadastro_completo: boolean
     }
     usuario: TUsuarioCorrenteBack
     empresa: {
@@ -93,6 +94,7 @@ export const usuarioCorrenteStates: TUsuarioCorrente = {
         autorizacao_id: '',
         autorizacao_email_acesso: null,
         autorizacao_numero_acesso: null,
+        autorizacao_usuario_cadastro_completo: false,
     },
     usuario: { ...usuarioValuesDefault },
     empresa: {

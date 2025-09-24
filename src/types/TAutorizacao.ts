@@ -1,6 +1,8 @@
+import { ObjectId } from 'mongodb'
+
 //src/types/TAutorizacao.ts
 export type TAutorizacao = {
-    _id: string | null
+    _id: ObjectId | null   // 👈 permite usar null como default
     email_acesso: string | null
     codigo_acesso: string | null    
     email_verificado: boolean
