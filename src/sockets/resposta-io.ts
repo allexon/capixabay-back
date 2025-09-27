@@ -127,10 +127,5 @@ export const repostasIO: TResposta[] = [
   // ******************** MENU PRINCIPAL ********************
   { slug: 'MENU-PRINCIPAL-OK', status: 'ok', comando: null, message: 'Dados do Menu Principal carreago com sucesso!' },
   { slug: 'MENU-PRINCIPAL-ATT', status: 'att', comando: null, message: 'Desculpe, não foi carregas dados do Menu Principal!' },
-  { slug: 'MENU-PRINCIPAL-ERROR', status: 'error', comando: null, message: 'Desculpe, não foi carregas dados do Menu Principal!' },
-
-  // ******************** CONFIG-APPP ********************
-  { slug: 'CONFIGAPP-OK', status: 'ok', comando: null, message: 'App configurado com sucesso!' },
-  { slug: 'CONFIGAPP-ATT', status: 'att', comando: null, message: 'Desculpe, não foi registar dados config app' },
-  { slug: 'CONFIGAPP-ERROR', status: 'error', comando: null, message: 'Desculpe, não foi registar dados config app' },
+  { slug: 'MENU-PRINCIPAL-ERROR', status: 'error', comando: null, message: 'Desculpe, não foi carregas dados do Menu Principal!' }
 ]

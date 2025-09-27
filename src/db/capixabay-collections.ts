@@ -10,7 +10,6 @@ import { TPedido } from '@/types/TPedido'
 import { TProduto } from '@/types/TProduto'
 import type { TMenuPrincipal } from '@/types/TMenuPrincipal'
 import type { TRota } from '@/types/TRota'
-import { TConfigApp } from '@/pages/config-app/TConfigApp'
 
 // ENUM com nomes fixos das coleções
 export enum Enun {
@@ -20,8 +19,7 @@ export enum Enun {
     ROTAS = 'ROTAS',
     PRODUTOS = 'PRODUTOS',
     PEDIDOS = 'PEDIDOS',
-    MENU_PRINCIPAL = 'MENU_PRINCIPAL',
-    CONFIGAPP = 'CONFIGAPP'
+    MENU_PRINCIPAL = 'MENU_PRINCIPAL'
 }
 
 // Tipagem associando cada coleção ao seu tipo
@@ -32,8 +30,7 @@ type Types = {
     [Enun.ROTAS]: TRota
     [Enun.PRODUTOS]: TProduto
     [Enun.PEDIDOS]: TPedido
-    [Enun.MENU_PRINCIPAL]: TMenuPrincipal
-    [Enun.CONFIGAPP]: TConfigApp
+    [Enun.MENU_PRINCIPAL]: TMenuPrincipal    
 }
 
 // Coleções globais (opcional para reuso)
@@ -48,8 +45,7 @@ export const fnStartCollections = (db: Db): void => {
         [Enun.ROTAS]: db.collection(Enun.ROTAS),
         [Enun.PRODUTOS]: db.collection(Enun.PRODUTOS),
         [Enun.PEDIDOS]: db.collection(Enun.PEDIDOS),
-        [Enun.MENU_PRINCIPAL]: db.collection(Enun.MENU_PRINCIPAL),
-        [Enun.CONFIGAPP]: db.collection(Enun.CONFIGAPP)
+        [Enun.MENU_PRINCIPAL]: db.collection(Enun.MENU_PRINCIPAL)        
     }
 }
 
@@ -61,8 +57,7 @@ export const fnGetCollectionsFromDb = (db: Db): { [K in Enun]: Collection<Types[
     [Enun.ROTAS]: db.collection(Enun.ROTAS),
     [Enun.PRODUTOS]: db.collection(Enun.PRODUTOS),
     [Enun.PEDIDOS]: db.collection(Enun.PEDIDOS),
-    [Enun.MENU_PRINCIPAL]: db.collection(Enun.MENU_PRINCIPAL),
-    [Enun.CONFIGAPP]: db.collection(Enun.CONFIGAPP),
+    [Enun.MENU_PRINCIPAL]: db.collection(Enun.MENU_PRINCIPAL)    
 })
 
 // Retorna coleções globais já inicializadas
@@ -74,8 +69,7 @@ export const fnGetCollections = (): { [K in Enun]: Collection<Types[K]> } => {
         !collections[Enun.ROTAS] ||
         !collections[Enun.PRODUTOS] ||
         !collections[Enun.PEDIDOS] ||
-        !collections[Enun.MENU_PRINCIPAL]  ||
-        !collections[Enun.CONFIGAPP]
+        !collections[Enun.MENU_PRINCIPAL]        
     ) {
         throw new Error('❌ Coleções globais não inicializadas. Use fnConnectAndInitCollections primeiro.')
     }

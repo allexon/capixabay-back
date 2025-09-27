@@ -35,10 +35,7 @@ const canais: IProps[] = [
     { canal:'LISTA_PEDIDOS_ENVIADOS_ACEITOS', local: '@/pages/pedido/ListaPedidosEnviadosAceitos', fn: 'ListaPedidosEnviadosAceitos'},
 
     // MENU PRINCIPAL
-    { canal:'MENU_PRINCIPAL', local: '@/pages/menu-principal/MenuPrincipal', fn: 'MenuPrincipal'},
-
-    // CONFIG APP
-    { canal:'CONFIGAPP', local: '@/pages/config-app/ConfigApp', fn: 'ConfigApp'},
+    { canal:'MENU_PRINCIPAL', local: '@/pages/menu-principal/MenuPrincipal', fn: 'MenuPrincipal'}
     
 ]
 
