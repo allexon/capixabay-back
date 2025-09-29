@@ -38,10 +38,10 @@ export const Login = async (req: TRequire, socket: Socket) => {
             // SE EMAIL ACESSO EXISTIR → compara código de acesso            
             if (req_codigo_acesso && req_codigo_acesso.trim() && req_codigo_acesso === resAutorizacao.codigo_acesso) {                
                 // EMAIL E CODIGO DE ACESSO JA EXISTEM
-                let res = await fnAutorizacaoUpdate(resAutorizacao, 'CODIGO-ACESSO-ATUAL')
+                let res = await fnAutorizacaoUpdate(resAutorizacao, 'CODIGO-ACESSO-ATUAL')                
                 fnRespostaIO(socket, IO.AUTORIZACAO, 'AUTORIZACAO-ACESSO-PERMITIDO', res.data)
             } else {                
-                // EMAIL EXISTE, MAS NÃO TEM UM CODIGO DE ACESSO VALIDO
+                // EMAIL EXISTE, MAS NÃO TEM UM CODIGO DE ACESSO VALIDO                
                 const resAutorizacaoUpdate = await fnAutorizacaoUpdate(resAutorizacao, 'NOVO-CODIGO-ACESSO')
 
                 if (!resAutorizacaoUpdate.status || !resAutorizacaoUpdate.data) {
@@ -53,7 +53,7 @@ export const Login = async (req: TRequire, socket: Socket) => {
                 const resEnvioEmail = await fnEnviarEmail({ email_acesso: req_email_acesso, codigo_acesso: novoCodigo })
 
                 if (resEnvioEmail) {                    
-                    const data = { ...resAutorizacaoUpdate.data, codigo_acesso: null } // não envia código real para front
+                    const data = { ...resAutorizacaoUpdate.data, codigo_acesso: null } // não envia código real para front                    
                     fnRespostaIO(socket, IO.AUTORIZACAO, 'AUTORIZACAO-INFORME-CODIGO-ACESSO', data)
                 } else {                    
                     fnRespostaIO(socket, IO.AUTORIZACAO, 'AUTORIZACAO-CODIGO-ACESSO-INVALIDO')
