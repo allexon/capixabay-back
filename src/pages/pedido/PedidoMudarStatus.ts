@@ -83,7 +83,7 @@ export const PedidoMudarStatus = async (data: any, socket: Socket) => {
             recebedorPayload = pedidosComprador
         } else {
             // Caso de um usuário que não é nem Comprador nem Vendedor do pedido (situação inesperada)
-            console.error('ERRO DE SEGURANÇA: Usuário logado não é parte desta transação. ID:', usuarioLogadoId)
+            //console.error('ERRO DE SEGURANÇA: Usuário logado não é parte desta transação. ID:', usuarioLogadoId)
             fnRespostaIO(socket, CANAL, `${RESPOSTA_IO}-ERROR`, { message: 'Usuário logado não é parte desta transação.' })
             return
         }
