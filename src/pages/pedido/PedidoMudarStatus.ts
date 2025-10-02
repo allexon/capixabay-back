@@ -15,12 +15,20 @@ export const PedidoMudarStatus = async (data: any, socket: Socket) => {
     const RESPOSTA_IO = 'PEDIDO-MUDAR-STATUS'
 
     try {
-        const { pedido_id, pedido_status } = data
-        if (!pedido_id || !pedido_status) {
-            fnRespostaIO(socket, CANAL, `${RESPOSTA_IO}-ERROR`)
-            return
+        // 🚨 CAMPO RECEBIDO DO FRONTEND (quem clicou no botão)
+        const { pedido_id, pedido_status, usuario_iniciador_id } = data 
+        
+        if (!pedido_id || !pedido_status || !usuario_iniciador_id) {
+             console.error('Dados incompletos recebidos:', data);
+             fnRespostaIO(socket, CANAL, `${RESPOSTA_IO}-ERROR`, { message: 'ID do iniciador, pedido ou status faltando.' })
+             return
         }
 
+        // 🚨 PASSO 1: O ID do usuário logado é AGORA o ID que veio do frontend
+        const usuarioLogadoId = usuario_iniciador_id 
+        
+        console.log(`✅ Usuário Logado ID (Iniciador): ${usuarioLogadoId}`)
+        
         // 🔹 Atualiza pedido e produtos
         const result = await PEDIDOS.updateOne(
             { _id: new ObjectId(pedido_id) },
@@ -46,19 +54,47 @@ export const PedidoMudarStatus = async (data: any, socket: Socket) => {
             return
         }
         
-        let usuarioCompradorId = pedidoAtualizado.produtos?.[0]?.usuario_comprador_id?? ''
-        let usuarioVendedorId = pedidoAtualizado.produtos?.[0]?.usuario_vendedor_id
+        // 🔹 Identifica Comprador e Vendedor
+        const usuarioCompradorId = pedidoAtualizado.produtos?.[0]?.usuario_comprador_id ?? ''
+        const usuarioVendedorId = pedidoAtualizado.produtos?.[0]?.usuario_vendedor_id
 
-        // 🔹 Totalização do comprador
+        // 🔹 Gera o payload para o Comprador (Alexon)
         const pedidosComprador = await fnPedidosEnviadosAceitos(usuarioCompradorId)
 
         let pedidosVendedor = null
         if (usuarioCompradorId !== usuarioVendedorId) {
+             // 🔹 Gera o payload para o Vendedor (Zé do Gás)
             pedidosVendedor = await fnPedidosEnviadosAceitos(usuarioVendedorId)
         }
 
-        fnRespostaIO(socket, CANAL, `${RESPOSTA_IO}-OK`, pedidosVendedor)
-        fnBroadcastIO(socket, CANAL, `${RESPOSTA_IO}-OK`, pedidosComprador)       
+
+        // 🎯 PASSO 2: IMPLEMENTAÇÃO DA LÓGICA DINÂMICA (Baseada no Iniciador)
+        let iniciadorPayload = null
+        let recebedorPayload = null
+
+        // Se quem iniciou é o Comprador (Alexon)
+        if (usuarioLogadoId === usuarioCompradorId) {
+            iniciadorPayload = pedidosComprador
+            recebedorPayload = pedidosVendedor
+        } 
+        // Se quem iniciou é o Vendedor (Zé do Gás)
+        else if (usuarioLogadoId === usuarioVendedorId) {
+            iniciadorPayload = pedidosVendedor
+            recebedorPayload = pedidosComprador
+        } else {
+            // Caso de um usuário que não é nem Comprador nem Vendedor do pedido (situação inesperada)
+            console.error('ERRO DE SEGURANÇA: Usuário logado não é parte desta transação. ID:', usuarioLogadoId)
+            fnRespostaIO(socket, CANAL, `${RESPOSTA_IO}-ERROR`, { message: 'Usuário logado não é parte desta transação.' })
+            return
+        }
+        
+        // 3. Envia para o INICIADOR (fnRespostaIO) - Só ele vai receber este socket
+        fnRespostaIO(socket, CANAL, `${RESPOSTA_IO}-OK`, iniciadorPayload)
+
+        // 4. Envia para o RECEBEDOR (fnBroadcastIO) - Todos os sockets ativos do recebedor
+        if (recebedorPayload) {
+            fnBroadcastIO(socket, CANAL, `${RESPOSTA_IO}-OK`, recebedorPayload)
+        }
 
     } catch (error: any) {
         console.error('❌ Erro em PedidoMudarStatus:', error)
