@@ -50,33 +50,36 @@ export const PedidoNovo = async (data: any, socket: Socket) => {
             })
 
             if (result) {
-                const usuarioId = String(_pedido[0].usuario_id)
-                const usuarioCompradorId = _pedido[0].usuario_id || _pedido[0].produtos[0].usuario_comprador_id
-                const usuarioVendedorId = _pedido[0].produtos[0].usuario_vendedor_id
+                // PONTO CHAVE: Aplicando a lógica de retorno idêntica ao PedidoMudarStatus
+                const usuarioCompradorId = String(_pedido[0].usuario_id)
+                const usuarioVendedorId = String(_pedido[0].produtos[0].usuario_vendedor_id)
 
-                console.log(':::: 2 USUARIO ID ::::', usuarioId)
-                
-                if (result) {
-                    const usuarioId = String(_pedido[0].usuario_id)
-                    const usuarioCompradorId = String(_pedido[0].usuario_id) // O comprador original é sempre quem fez o pedido
-                    const usuarioVendedorId = String(_pedido[0].produtos[0].usuario_vendedor_id)
+                let pedidos = null
 
-                    // 1. Envia a resposta para o usuário que fez o pedido (o comprador)
-                    const pedidosComprador = await fnPedidosEnviadosAceitos(usuarioId)
-                    fnRespostaIO(socket, CANAL, `${RESPOSTA_IO}-OK`, pedidosComprador)
+                if (usuarioCompradorId === usuarioVendedorId) {
+                    // Caso 1: Usuário compra dele mesmo (Comprador/Vendedor são o mesmo)
+                    const pedidosCompradorVendedor = await fnPedidosEnviadosAceitos(usuarioCompradorId)
+                    pedidos = { pedidosCompradorVendedor: pedidosCompradorVendedor }
 
-                    // 2. Transmite a atualização para o vendedor, se ele for uma pessoa diferente
-                    if (usuarioCompradorId !== usuarioVendedorId) {
-                        const pedidosVendedor = await fnPedidosEnviadosAceitos(usuarioVendedorId)
-                        fnBroadcastIO(socket, CANAL, `${RESPOSTA_IO}-OK`, pedidosVendedor)
-                    }
+                    // Broadcast para todos (incluindo o comprador/vendedor)
+                    fnBroadcastIO(socket, CANAL, `${RESPOSTA_IO}-OK`, pedidos)
+                } else {
+                    // Caso 2: Transação normal (Comprador e Vendedor são diferentes)
+                    const pedidosComprador = await fnPedidosEnviadosAceitos(usuarioCompradorId)
+                    const pedidosVendedor = await fnPedidosEnviadosAceitos(usuarioVendedorId)
+
+                    // Empacota os dados para ambos (Comprador e Vendedor) no mesmo payload
+                    pedidos = { pedidosComprador: pedidosComprador, pedidosVendedor: pedidosVendedor }
+
+                    // Broadcast para todos, garantindo que o Comprador receba sua lista e o Vendedor a dele.
+                    fnBroadcastIO(socket, CANAL, `${RESPOSTA_IO}-OK`, pedidos)
                 }
             }
         } else {
             fnRespostaIO(socket, CANAL, `${RESPOSTA_IO}-ATT`)
         }
     } catch (error: any) {
-        console.error('❌ Erro em ioPedido:', error)
+        console.error('❌ Erro em PedidoNovo:', error)
         fnRespostaIO(socket, CANAL, `${RESPOSTA_IO}-ERROR`)
     }
 }
