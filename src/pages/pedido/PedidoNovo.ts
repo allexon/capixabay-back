@@ -49,29 +49,21 @@ export const PedidoNovo = async (data: any, socket: Socket) => {
                 return resInsert.insertedId
             })
 
-            if (result) {
-                // PONTO CHAVE: Aplicando a lógica de retorno idêntica ao PedidoMudarStatus
-                const usuarioCompradorId = String(_pedido[0].usuario_id)
+            if (result) {                
+                const usuarioCompradorId = String(_pedido[0].produtos[0].usuario_comprador_id)
                 const usuarioVendedorId = String(_pedido[0].produtos[0].usuario_vendedor_id)
 
                 let pedidos = null
-
-                if (usuarioCompradorId === usuarioVendedorId) {
-                    // Caso 1: Usuário compra dele mesmo (Comprador/Vendedor são o mesmo)
+                if (usuarioCompradorId === usuarioVendedorId) {                   
                     const pedidosCompradorVendedor = await fnPedidosEnviadosAceitos(usuarioCompradorId)
                     pedidos = { pedidosCompradorVendedor: pedidosCompradorVendedor }
-
-                    // Broadcast para todos (incluindo o comprador/vendedor)
+                    //console.log(':::: 1 PEDIDOS :::::', pedidos)
                     fnBroadcastIO(socket, CANAL, `${RESPOSTA_IO}-OK`, pedidos)
-                } else {
-                    // Caso 2: Transação normal (Comprador e Vendedor são diferentes)
+                } else {                    
                     const pedidosComprador = await fnPedidosEnviadosAceitos(usuarioCompradorId)
                     const pedidosVendedor = await fnPedidosEnviadosAceitos(usuarioVendedorId)
-
-                    // Empacota os dados para ambos (Comprador e Vendedor) no mesmo payload
                     pedidos = { pedidosComprador: pedidosComprador, pedidosVendedor: pedidosVendedor }
-
-                    // Broadcast para todos, garantindo que o Comprador receba sua lista e o Vendedor a dele.
+                    //console.log(':::: 2 PEDIDOS :::::', pedidos)                    
                     fnBroadcastIO(socket, CANAL, `${RESPOSTA_IO}-OK`, pedidos)
                 }
             }
